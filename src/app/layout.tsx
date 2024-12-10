@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import {Outfit} from "next/font/google";
+import { Outfit } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
+import QueryProvider from "@/providers/query-provider";
 
-const outfit = Outfit({subsets: ["latin"]});
+const outfit = Outfit({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Taskup",
@@ -21,7 +22,9 @@ export default function RootLayout({
       <body
         className={cn(outfit.className, 'antialiased min-h-screen')}
       >
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

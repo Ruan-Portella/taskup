@@ -13,10 +13,13 @@ import {
 } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SignUpInfer, SignUpSchema } from './schemas'
-import CardWrapper from '@/components/auth/card-wrapper'
+import { SignUpInfer, SignUpSchema } from '../../../features/auth/schemas/register'
+import CardWrapper from '@/features/auth/components/card-wrapper'
+import { useRegister } from '../../../features/auth/api/use-register';
 
 export default function SignUp() {
+  const {mutate} = useRegister();
+
   const form = useForm<SignUpInfer>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
@@ -27,7 +30,7 @@ export default function SignUp() {
   });
 
   const onSubmit = (data: SignUpInfer) => {
-    console.log(data);
+    mutate(data);
   };
 
   return (

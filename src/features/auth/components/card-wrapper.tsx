@@ -64,11 +64,11 @@ export default function CardWrapper({
         social && (
           <CardContent className='p-7 pb-0 flex gap-x-4'>
             <Button disabled={false} variant='secondary' size='lg' className='w-1/2'>
-              <FcGoogle className='mr-2' />
+              <FcGoogle />
               Entrar com Google
             </Button>
             <Button disabled={false} variant='secondary' size='lg' className='w-1/2'>
-              <FaGithub className='mr-2' />
+              <FaGithub />
               Entrar com Github
             </Button>
           </CardContent>
