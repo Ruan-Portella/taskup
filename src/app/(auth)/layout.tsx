@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: LayoutProps) {
       <div className="mx-auto max-w-screen-2xl p-4">
         <nav className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="Logo" width={30} height={30} />
+            <Image src="/logo.svg" alt="Logo" width={30} height={30} style={{width: '30px', height: '30px'}} />
             <h1 className="text-xl font-bold">TaskUp</h1>
           </div>
         </nav>

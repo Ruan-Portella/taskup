@@ -13,12 +13,12 @@ import {
 } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SignInInfer, SignInSchema } from '../../../features/auth/schemas/login'
+import { SignInInfer, SignInSchema } from '@/features/auth/schemas/login'
 import CardWrapper from '@/features/auth/components/card-wrapper'
-import { useLogin } from '../../../features/auth/api/use-login';
+import { useLogin } from '@/features/auth/api/use-login';
 
 export default function SignIn() {
-  const {mutate} = useLogin();
+  const { mutate } = useLogin();
 
   const form = useForm<SignInInfer>({
     resolver: zodResolver(SignInSchema),
@@ -52,6 +52,8 @@ export default function SignIn() {
                 <FormControl>
                   <Input
                     {...field}
+                    id='email'
+                    autoComplete='email'
                     type='email'
                     placeholder='ruanportelladev@gmail.com'
                   />
@@ -69,6 +71,8 @@ export default function SignIn() {
                 <FormControl>
                   <Input
                     {...field}
+                    id='password'
+                    autoComplete='current-password'
                     type='password'
                     placeholder='******'
                   />

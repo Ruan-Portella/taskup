@@ -13,12 +13,12 @@ import {
 } from '@/components/ui/form'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SignUpInfer, SignUpSchema } from '../../../features/auth/schemas/register'
+import { SignUpInfer, SignUpSchema } from '@/features/auth/schemas/register'
 import CardWrapper from '@/features/auth/components/card-wrapper'
-import { useRegister } from '../../../features/auth/api/use-register';
+import { useRegister } from '@/features/auth/api/use-register';
 
 export default function SignUp() {
-  const {mutate} = useRegister();
+  const { mutate } = useRegister();
 
   const form = useForm<SignUpInfer>({
     resolver: zodResolver(SignUpSchema),
@@ -53,6 +53,8 @@ export default function SignUp() {
                 <FormControl>
                   <Input
                     {...field}
+                    id='name'
+                    autoComplete='name'
                     type='text'
                     placeholder='Ruan Portella'
                   />
@@ -70,6 +72,8 @@ export default function SignUp() {
                 <FormControl>
                   <Input
                     {...field}
+                    id='email'
+                    autoComplete='email'
                     type='email'
                     placeholder='ruanportelladev@gmail.com'
                   />
@@ -87,6 +91,8 @@ export default function SignUp() {
                 <FormControl>
                   <Input
                     {...field}
+                    id='password'
+                    autoComplete='current-password'
                     type='password'
                     placeholder='******'
                   />
