@@ -15,6 +15,7 @@ interface CardWrapperProps {
   href: string;
   hrefLabel: string;
   hrefName: string;
+  isPending?: boolean;
 };
 
 export default function CardWrapper({
@@ -24,7 +25,8 @@ export default function CardWrapper({
   social,
   href,
   hrefLabel,
-  hrefName
+  hrefName,
+  isPending,
 }: CardWrapperProps) {
   return (
     <Card className='w-full md:w-[487px] border shadow-lg'>
@@ -63,11 +65,11 @@ export default function CardWrapper({
       {
         social && (
           <CardContent className='p-7 pb-0 flex gap-x-4'>
-            <Button disabled={false} variant='secondary' size='lg' className='w-1/2'>
+            <Button disabled={isPending} variant='secondary' size='lg' className='w-1/2'>
               <FcGoogle />
               Entrar com Google
             </Button>
-            <Button disabled={false} variant='secondary' size='lg' className='w-1/2'>
+            <Button disabled={isPending} variant='secondary' size='lg' className='w-1/2'>
               <FaGithub />
               Entrar com Github
             </Button>
