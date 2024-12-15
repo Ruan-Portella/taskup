@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { Account, Client } from "node-appwrite";
-import { AUTH_COOKIE } from "./server/route";
+import { AUTH_COOKIE } from "../server/route";
 
 export const getUser = async () => {
   try {
