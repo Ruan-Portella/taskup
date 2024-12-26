@@ -42,7 +42,7 @@ const routes = [
 
 export function Navigation() {
   return (
-    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+    <SidebarGroup>
       <SidebarMenu>
         {routes.map((item) => {
           const isActive = item.label === 'Inicio';

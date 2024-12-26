@@ -4,14 +4,14 @@ import { InferRequestType, InferResponseType } from "hono";
 import {client} from '@/lib/rpc';
 
 type ResponseType = InferResponseType<typeof client.api.workspaces['$post']>;
-type RequestType = InferRequestType<typeof client.api.workspaces['$post']>['json'];
+type RequestType = InferRequestType<typeof client.api.workspaces['$post']>['form'];
 
 export const useCreate = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, unknown, RequestType>({
-    mutationFn: async (json) => {
-      const response = await client.api.workspaces.$post({json});
+    mutationFn: async (form) => {
+      const response = await client.api.workspaces.$post({form});
 
       if (!response.ok) {
         throw new Error('Erro ao criar a área de trabalho');
@@ -20,7 +20,7 @@ export const useCreate = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Area de trabalho criada com sucesso!');
+      toast.success('Área de trabalho criada com sucesso!');
       queryClient.invalidateQueries({ queryKey: 'workspaces' });
     },
     onError: () => {

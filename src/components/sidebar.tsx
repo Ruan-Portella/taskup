@@ -16,9 +16,11 @@ import { UserButton } from "@/features/auth/components/user-button"
 import Link from "next/link"
 import Image from "next/image"
 import { Navigation } from "./navigation"
+import { DottedSeparator } from "./dotted-separator"
+import { WorkspaceSwitcher } from "./workspace-switcher"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const {open} = useSidebar();
+  const { open } = useSidebar();
 
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
@@ -37,9 +39,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
+        <WorkspaceSwitcher />
+        <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
         <Navigation />
       </SidebarContent>
       <SidebarFooter>
+        <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
         <UserButton showName={open} />
       </SidebarFooter>
     </Sidebar>
