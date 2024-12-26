@@ -23,8 +23,8 @@ export default function RootLayout({
       <body
         className={cn(outfit.className, 'antialiased min-h-screen')}
       >
+        <Toaster />
         <QueryProvider>
-          <Toaster />
           {children}
         </QueryProvider>
       </body>

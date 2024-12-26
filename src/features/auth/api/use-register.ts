@@ -24,7 +24,7 @@ export const useRegister = () => {
     onSuccess: () => {
       toast.success('Cadastro efetuado com sucesso!');
       router.refresh();
-      queryClient.invalidateQueries({ queryKey: 'me' });
+      queryClient.invalidateQueries({ queryKey: ['me'] });
     },
     onError: () => {
       toast.error('Erro ao efetuar cadastro');

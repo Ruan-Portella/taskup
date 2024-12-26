@@ -21,7 +21,7 @@ export const useCreate = () => {
     },
     onSuccess: () => {
       toast.success('Área de trabalho criada com sucesso!');
-      queryClient.invalidateQueries({ queryKey: 'workspaces' });
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] });
     },
     onError: () => {
       toast.error('Erro ao criar a área de trabalho');
