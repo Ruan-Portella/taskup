@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils";
 import QueryProvider from "@/providers/query-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         className={cn(outfit.className, 'antialiased min-h-screen')}
       >
         <QueryProvider>
+          <Toaster />
           {children}
         </QueryProvider>
       </body>
