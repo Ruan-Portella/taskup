@@ -14,12 +14,14 @@ import { useCreate } from "../api/use-create";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ImageIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface CreateFormProps {
   onCancel?: () => void;
 };
 
 export const CreateForm = ({ onCancel }: CreateFormProps) => {
+  const router = useRouter();
   const { mutate, isPending } = useCreate();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -38,9 +40,9 @@ export const CreateForm = ({ onCancel }: CreateFormProps) => {
     };
 
     mutate(finalValues, {
-      onSuccess: () => {
+      onSuccess: ({data}) => {
         form.reset();
-        // REDIRECIONAR PARA A PÁGINA DA ÁREA DE TRABALHO
+        router.push(`/workspaces/${data.$id}`);
       }
     });
   };
@@ -71,12 +73,13 @@ export const CreateForm = ({ onCancel }: CreateFormProps) => {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
+                    <FormLabel htmlFor="name">
                       Nome
                     </FormLabel>
                     <FormControl>
                       <Input
                         {...field}
+                        id="name"
                         autoComplete='name'
                         placeholder="Nome da Área de Trabalho"
                       />

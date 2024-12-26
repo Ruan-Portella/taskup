@@ -1,9 +1,12 @@
-import { CreateForm } from "@/features/workspaces/components/create-form";
+import { getWorkspaces } from "@/features/workspaces/api/get-workspaces";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
-  return (
-    <div className="h-full">
-     <CreateForm />
-    </div>
-  );
+  const workspaces = await getWorkspaces();
+
+  if (workspaces.total === 0) {
+    redirect("/workspaces/create");
+  } else {
+    redirect(`/workspaces/${workspaces.documents[0].$id}`);
+  }
 }
