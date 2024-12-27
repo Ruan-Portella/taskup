@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/sidebar"
 
 import { GoCheckCircle, GoCheckCircleFill, GoHome, GoHomeFill } from 'react-icons/go';
+import { useWorkspacesId } from "@/features/workspaces/hooks/use-workspaces-id";
+import { usePathname } from "next/navigation";
 
 import { SettingsIcon, UsersIcon } from 'lucide-react';
 import Link from "next/link";
@@ -41,17 +43,21 @@ const routes = [
 ];
 
 export function Navigation() {
+  const workspaceId = useWorkspacesId();
+  const pathname = usePathname();
+
   return (
     <SidebarGroup>
       <SidebarMenu>
         {routes.map((item) => {
-          const isActive = item.label === 'Inicio';
+          const fullHref = `/workspaces/${workspaceId}${item.href}`;
+          const isActive = pathname === fullHref;
           const Icon = isActive ? item.activeIcon : item.icon;
 
           return (
-            <SidebarMenuItem key={item.href}>
+            <SidebarMenuItem key={fullHref}>
               <SidebarMenuButton asChild className={cn('', isActive && 'bg-white shadow-sm font-bold text-primary')}>
-                <Link href={item.href}>
+                <Link href={fullHref}>
                   <Icon className="size-5 text-neutral-500" />
                   {item.label}
                 </Link>
