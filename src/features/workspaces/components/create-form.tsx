@@ -15,6 +15,7 @@ import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface CreateFormProps {
   onCancel?: () => void;
@@ -132,7 +133,7 @@ export const CreateForm = ({ onCancel }: CreateFormProps) => {
             </div>
             <DottedSeparator className="py-9" />
             <div className="flex items-center justify-between">
-              <Button disabled={isPending} type="button" size='lg' variant='secondary' onClick={onCancel}>
+              <Button disabled={isPending} type="button" size='lg' variant='secondary' onClick={onCancel} className={cn(!onCancel && 'invisible')}>
                 Cancelar
               </Button>
               <Button disabled={isPending} type="submit" size='lg' onClick={onCancel}>

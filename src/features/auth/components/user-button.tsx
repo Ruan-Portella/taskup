@@ -7,13 +7,11 @@ import { DottedSeparator } from "@/components/dotted-separator";
 import { useLogout } from "../api/use-logout";
 import { useMe } from "../api/use-me";
 import { Loader, LogOut } from "lucide-react";
-import { useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 export const UserButton = ({showName}: {showName: boolean}) => {
   const { data: user, isLoading } = useMe();
   const { mutate: logout } = useLogout();
-  const {open} = useSidebar();
 
   if (isLoading) {
     return (
@@ -34,7 +32,7 @@ export const UserButton = ({showName}: {showName: boolean}) => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="outline-none relative flex items-center gap-2">
-        <Avatar className={cn('hover:opacity-75 transition border border-neutral-300', open ? 'size-10' : 'size-8')}>
+        <Avatar className={cn('hover:opacity-75 transition border border-neutral-300 size-8')}>
           <AvatarFallback className="bg-neutral-200 font-medium text-neutral-500 flex items-center justify-center">
             {avatarFallback}
           </AvatarFallback>
