@@ -20,7 +20,7 @@ export default function StandaloneLayout({ children }: StandaloneLayoutProps) {
           </Link>
           <UserButton showName={false} />
         </nav>
-        <div className='flex flex-col items-center justify-center' style={{ height: 'calc(100vh - 90px)' }}>
+        <div className='mt-4 flex flex-col items-center justify-center'>
           {children}
         </div>
       </div>

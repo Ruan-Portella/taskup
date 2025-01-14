@@ -13,12 +13,14 @@ import { Button } from "@/components/ui/button";
 import { useUpdateWorkspace } from "../api/use-update-workspaces";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { ArrowLeftIcon, ImageIcon } from "lucide-react";
+import { ArrowLeftIcon, CopyIcon, ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Workspace } from "../types/workspace";
 import { useConfirm } from "@/hooks/use-confirm";
 import { useDeleteWorkspaces } from "../api/use-delete-workspace";
+import { toast } from "sonner";
+import { useResetInviteCode } from "../api/use-reset-invite-code";
 
 interface EditWorkspacesFormProps {
   onCancel?: () => void;
@@ -28,8 +30,10 @@ interface EditWorkspacesFormProps {
 export const EditWorkspacesForm = ({ onCancel, initialValues }: EditWorkspacesFormProps) => {
   const router = useRouter();
   const { mutate, isPending } = useUpdateWorkspace();
-  const {mutate: deleteWorkspace, isPending: isDeletingWorkspace} = useDeleteWorkspaces();
+  const { mutate: deleteWorkspace, isPending: isDeletingWorkspace } = useDeleteWorkspaces();
+  const { mutate: resetInviteCode, isPending: isResetingInviteCode } = useResetInviteCode();
   const [DeleteDialog, confirmDelete] = useConfirm('Você tem certeza que deseja excluir esta Área de Trabalho?', 'Essa ação é irreversível.', 'destructive');
+  const [ResetDialog, confirmReset] = useConfirm('Você tem certeza que deseja resetar o link de convite?', 'Isso irá gerar um novo link de convite para a Área de Trabalho.', 'destructive');
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +57,22 @@ export const EditWorkspacesForm = ({ onCancel, initialValues }: EditWorkspacesFo
     }, {
       onSuccess: () => {
         window.location.href = '/';
+      }
+    })
+  }
+
+  const handleResetInviteCode = async () => {
+    const ok = await confirmReset();
+
+    if (!ok) {
+      return;
+    }
+
+    resetInviteCode({
+      param: { workspaceId: initialValues.$id }
+    }, {
+      onSuccess: () => {
+        router.refresh();
       }
     })
   }
@@ -81,9 +101,19 @@ export const EditWorkspacesForm = ({ onCancel, initialValues }: EditWorkspacesFo
     }
   };
 
+  const handleCopyInviteLink = () => {
+    navigator.clipboard.writeText(fullInviteLink)
+    .then(() => {
+      toast.success('Link copiado com sucesso!');
+    })
+  };
+
+  const fullInviteLink = `${window.location.origin}/workspaces/${initialValues.$id}/join/${initialValues.inviteCode}`;
+
   return (
     <div className="flex flex-col gap-y-4">
       <DeleteDialog />
+      <ResetDialog />
       <Card className="w-full h-full border-none shadow-none">
         <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
           <Button size='sm' variant='secondary' onClick={onCancel ? onCancel : () => router.push(`/workspaces/${initialValues.$id}`)}>
@@ -193,11 +223,36 @@ export const EditWorkspacesForm = ({ onCancel, initialValues }: EditWorkspacesFo
         <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold">
+              Convidar Membros
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Compartilhe este link para convidar membros para a Área de Trabalho.
+            </p>
+            <div className="mt-4">
+              <div className="flex items-center gap-x-2">
+                <Input disabled value={fullInviteLink} />
+                <Button className="size-12" variant='secondary' onClick={handleCopyInviteLink}>
+                  <CopyIcon className="size-5" />
+                </Button>
+              </div>
+            </div>
+            <DottedSeparator className="py-7" />
+            <Button size='sm' variant='destructive' className="mt-6 w-fit ml-auto" type="button" disabled={isPending || isResetingInviteCode} onClick={handleResetInviteCode}>
+              Resetar Link de Convite
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="w-full h-full border-none shadow-none" >
+        <CardContent className="p-7">
+          <div className="flex flex-col">
+            <h3 className="font-bold">
               Zona de Perigo
             </h3>
             <p className="text-sm text-muted-foreground">
               Aqui você pode excluir a Área de Trabalho. Esta ação é irreversível.
             </p>
+            <DottedSeparator className="py-7" />
             <Button size='sm' variant='destructive' className="mt-6 w-fit ml-auto" type="button" disabled={isPending || isDeletingWorkspace} onClick={handleDelete}>
               Excluir Área de Trabalho
             </Button>
