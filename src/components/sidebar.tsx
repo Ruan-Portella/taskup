@@ -20,7 +20,7 @@ import { DottedSeparator } from "./dotted-separator"
 import { WorkspaceSwitcher } from "./workspace-switcher"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { open } = useSidebar();
+  const { open, openMobile } = useSidebar();
 
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
@@ -46,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarFooter>
         <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
-        <UserButton showName={open} />
+        <UserButton showName={open || openMobile} />
       </SidebarFooter>
     </Sidebar>
   )

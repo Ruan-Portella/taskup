@@ -146,10 +146,10 @@ export const CreateForm = ({ onCancel }: CreateFormProps) => {
             </div>
             <DottedSeparator className="py-9" />
             <div className="flex items-center justify-between">
-              <Button disabled={isPending} type="button" size='lg' variant='secondary' onClick={onCancel} className={cn(!onCancel && 'invisible')}>
+              <Button disabled={isPending} type="button" size='lg' variant='secondary' onClick={onCancel} className={cn('p-4', !onCancel && 'hidden')}>
                 Cancelar
               </Button>
-              <Button disabled={isPending} type="submit" size='lg' onClick={onCancel}>
+              <Button disabled={isPending} type="submit" className="ml-auto p-4" size='lg' onClick={onCancel}>
                 Criar Área de Trabalho
               </Button>
             </div>
