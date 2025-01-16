@@ -31,3 +31,21 @@ export const getWorkspace = async ({workspaceId}: {workspaceId: string}) => {
     return null;
   }
 }
+
+export const getWorkspaceInfo = async ({workspaceId}: {workspaceId: string}) => {
+  try {
+    const {databases} = await createSessionClient();
+
+    const workspaces = await databases.getDocument<Workspace>(
+      DATABASE_ID,
+      WORKSPACE_ID,
+      workspaceId
+    );
+
+    return {
+      name: workspaces.name,
+    }
+  } catch {
+    return null;
+  }
+}
