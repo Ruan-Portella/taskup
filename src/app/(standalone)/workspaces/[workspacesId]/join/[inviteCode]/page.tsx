@@ -12,9 +12,10 @@ interface InviteCodePageProps {
 export default async function InviteCodePage({
   params,
 }: InviteCodePageProps) {
+  const { workspacesId } = await params;
 
   const initialValues = await getWorkspaceInfo({
-    workspaceId: params.workspacesId
+    workspaceId: workspacesId,
   })
 
   if (!initialValues) {
