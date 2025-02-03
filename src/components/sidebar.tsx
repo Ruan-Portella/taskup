@@ -18,6 +18,7 @@ import Image from "next/image"
 import { Navigation } from "./navigation"
 import { DottedSeparator } from "./dotted-separator"
 import { WorkspaceSwitcher } from "./workspace-switcher"
+import { Projects } from "./projects"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open, openMobile } = useSidebar();
@@ -43,6 +44,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <WorkspaceSwitcher />
         <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
         <Navigation />
+        <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
+        <Projects />
       </SidebarContent>
       <SidebarFooter>
         <DottedSeparator className="group-data-[collapsible=icon]:hidden" />
