@@ -10,8 +10,6 @@ import { usePathname } from "next/navigation";
 import { RiAddCircleFill } from "react-icons/ri";
 
 export const Projects = () => {
-  const projectId = null;
-
   const workspaceId = useWorkspacesId();
   const {open} = useCreateProjectModal();
   const pathname = usePathname();
@@ -25,12 +23,12 @@ export const Projects = () => {
       </div>
       {
         data?.documents.map((project) => {
-          const href = `/workspaces/${workspaceId}/projects/${projectId}`;
+          const href = `/workspaces/${workspaceId}/projects/${project.$id}`;
           const isActive = pathname === href;
 
           return (
             <Link href={href} key={project.$id}>
-              <div className={cn('flex items-center gap-2.5 p-2.5 rounded-md hover:opacity-75 transition cursor-pointer text-neutral-500', isActive && 'bg-white shadow-sm hover:opacity-100 text-primary')}>
+              <div className={cn('flex items-center gap-2.5 py-1 px-2.5 rounded-md hover:opacity-75 transition cursor-pointer text-neutral-500', isActive && 'bg-white shadow-sm hover:opacity-100 text-primary')}>
                 <ProjectAvatar image={project.imageUrl} name={project.name} />
                 <span className="truncate">{project.name}</span>
               </div>

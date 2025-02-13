@@ -4,9 +4,7 @@ import { redirect } from 'next/navigation';
 import React from 'react'
 
 interface InviteCodePageProps {
-  params: {
-    workspacesId: string
-  };
+  params:  Promise<{ workspacesId: string}>;
 }
 
 export default async function InviteCodePage({
