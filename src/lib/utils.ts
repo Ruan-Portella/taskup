@@ -15,3 +15,15 @@ export function generateInviteCode(length: number) {
 
   return result;
 }
+
+export function statusToPTBR(str: string): string {
+  const statusPtBR: { [key: string]: string } = {
+    'BACKLOG': 'Pendente',
+    'TODO': 'A Fazer',
+    'IN_PROGRESS': 'Em Progresso',
+    'IN_REVIEW': 'Em Revisão',
+    'DONE': 'Concluído',
+  }
+
+  return statusPtBR[str] as string;
+}
