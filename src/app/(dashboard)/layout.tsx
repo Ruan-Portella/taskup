@@ -5,6 +5,7 @@ import { CreateWorkspacesForm } from "@/features/workspaces/components/create-wo
 import { CreateProjectModal } from "@/features/projects/components/create-project-modal";
 import CreateTaskModal from "@/features/tasks/components/create-task-modal";
 import PageLayout from "./pageLayout";
+import EditTaskModal from "@/features/tasks/components/edit-task-modal";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -19,6 +20,7 @@ export default async function DashboardLayout({ children }: LayoutProps) {
           <CreateWorkspacesForm />
           <CreateProjectModal />
           <CreateTaskModal />
+          <EditTaskModal />
           <PageLayout>
             {children}
           </PageLayout>
