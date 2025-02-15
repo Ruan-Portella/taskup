@@ -17,14 +17,16 @@ import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@
 import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { TaskStatus } from "../types";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
+import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 
 interface CreateTaskFormProps {
   onCancel?: () => void;
   projectOptions: { id: string, name: string, imageUrl: string }[];
   memberOptions: { id: string, name: string }[];
+  status: TaskStatus | undefined
 };
 
-export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions }: CreateTaskFormProps) => {
+export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status }: CreateTaskFormProps) => {
   const workspaceId = useWorkspacesId();
   const { mutate, isPending } = useCreateTask();
 
@@ -32,6 +34,7 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions }: Crea
     resolver: zodResolver(createTaskSchema.omit({ workspaceId: true })),
     defaultValues: {
       workspaceId,
+      status: status
     }
   })
 
@@ -126,7 +129,7 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions }: Crea
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
                 control={form.control}
                 name="status"
                 render={({ field }) => (
@@ -163,7 +166,7 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions }: Crea
                   </FormItem>
                 )}
               />
-                            <FormField
+              <FormField
                 control={form.control}
                 name="projectId"
                 render={({ field }) => (

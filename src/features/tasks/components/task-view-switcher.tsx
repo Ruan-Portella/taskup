@@ -13,6 +13,7 @@ import DataFilters from './data-filters';
 import { useTaskFilters } from '../hooks/use-task-filters';
 import { DataTable } from './data-table';
 import { columns } from './columns';
+import DataKanban from './data-kanban';
 
 export default function TaskViewSwitcher() {
   const [{
@@ -45,7 +46,7 @@ export default function TaskViewSwitcher() {
               Calendário
             </TabsTrigger>
           </TabsList>
-          <Button onClick={open} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4 mr-2' />Adicionar tarefa</Button>
+          <Button onClick={() => open()} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4 mr-2' />Adicionar tarefa</Button>
         </div>
         <DottedSeparator className='my-4' />
         <DataFilters />
@@ -61,9 +62,7 @@ export default function TaskViewSwitcher() {
                 <DataTable columns={columns} data={tasks?.documents ?? []} />
               </TabsContent>
               <TabsContent value='kanban' className='mt-0'>
-                {
-                  JSON.stringify(tasks)
-                }
+                <DataKanban data={tasks?.documents ?? []} />
               </TabsContent>
               <TabsContent value='calendar' className='mt-0'>
                 {
