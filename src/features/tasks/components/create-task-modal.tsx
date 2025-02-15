@@ -7,7 +7,7 @@ import CreateTaskFormWrapper from './create-task-form-wrapper';
 import { TaskStatus } from '../types';
 
 export default function CreateTaskModal() {
-  const { isOpen, setIsOpen, status } = useCreateTaskModal()
+  const { isOpen, setIsOpen, status, close } = useCreateTaskModal()
 
   const statusTask = status ? status as TaskStatus : undefined
 
