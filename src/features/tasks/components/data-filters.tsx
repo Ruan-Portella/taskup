@@ -53,23 +53,27 @@ export default function DataFilters({ hideProjectFilter }: DataFiltersProps) {
 
   return (
     <div className='flex flex-col lg:flex-row gap-2'>
-      <Select defaultValue={projectId ?? undefined} onValueChange={(value) => onProjectChange(value)}>
-        <SelectTrigger className='w-full lg:w-auto h-8'>
-          <div className='flex items-center gap-2'>
-            <UserIcon className='size-4' />
-            <SelectValue placeholder='Todos Projetos' />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='all'>Todos Projetos</SelectItem>
-          <SelectSeparator />
-          {projectOptions?.map(project => (
-            <SelectItem key={project.value} value={project.value}>
-              {project.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {
+        !hideProjectFilter && (
+          <Select defaultValue={projectId ?? undefined} onValueChange={(value) => onProjectChange(value)}>
+            <SelectTrigger className='w-full lg:w-auto h-8'>
+              <div className='flex items-center gap-2'>
+                <UserIcon className='size-4' />
+                <SelectValue placeholder='Todos Projetos' />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Todos Projetos</SelectItem>
+              <SelectSeparator />
+              {projectOptions?.map(project => (
+                <SelectItem key={project.value} value={project.value}>
+                  {project.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )
+      }
       <Select defaultValue={assigneeId ?? undefined} onValueChange={(value) => onAssigneeChange(value)}>
         <SelectTrigger className='w-full lg:w-auto h-8'>
           <div className='flex items-center gap-2'>
@@ -87,7 +91,7 @@ export default function DataFilters({ hideProjectFilter }: DataFiltersProps) {
           ))}
         </SelectContent>
       </Select>
-      <DatePicker className='h-8 lg:w-fit' placeholder='Data de Entrega' value={dueDate ? new Date(dueDate) : undefined} onChange={(value) => setFilters({ dueDate: value ? value.toISOString() : null})} />
+      <DatePicker className='h-8 lg:w-fit' placeholder='Data de Entrega' value={dueDate ? new Date(dueDate) : undefined} onChange={(value) => setFilters({ dueDate: value ? value.toISOString() : null })} />
       <Select defaultValue={status ?? undefined} onValueChange={(value) => onStatusChange(value)}>
         <SelectTrigger className='w-full lg:w-auto h-8'>
           <div className='flex items-center gap-2'>
