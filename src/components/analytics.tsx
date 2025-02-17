@@ -26,7 +26,6 @@ export default function Analytics({ data }: ProjectAnalyticsResponseType) {
         </div>
         <div className='flex items-center flex-1'>
           <AnalyticsCard title='Tarefas Incompletas' value={data.incompleteTaskCount} variant={data.incompleteTaskDifference > 0 ? 'up' : 'down'} increaseValue={data.incompleteTaskDifference} />
-          <DottedSeparator direction='vertical' />
         </div>
       </div>
       <ScrollBar orientation='horizontal' />
