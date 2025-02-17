@@ -1,4 +1,4 @@
-import { BUCKET_ID, DATABASE_ID, PROJECTS_ID } from "@/config";
+import { BUCKET_ID, DATABASE_ID, PROJECTS_ID, TASKS_ID } from "@/config";
 import { getMember } from "@/features/members/utils/get-member";
 import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
@@ -8,6 +8,8 @@ import { z } from "zod";
 import { createProjectSchema } from "../schemas/create";
 import { updateProjectSchema } from "../schemas/update";
 import { Project } from "../types/project";
+import { endOfMonth, startOfMonth, subMonths } from "date-fns";
+import { TaskStatus } from "@/features/tasks/types";
 
 const app = new Hono()
   .get(
@@ -36,6 +38,189 @@ const app = new Hono()
       )
 
       return c.json({ data: projects })
+    }
+  )
+  .get(
+    '/:projectId',
+    sessionMiddleware,
+    async (c) => {
+      const databases = c.get('databases');
+      const user = c.get('user');
+      const { projectId } = c.req.param();
+
+      const project = await databases.getDocument<Project>(DATABASE_ID, PROJECTS_ID, projectId);
+
+      const member = await getMember({
+        databases,
+        userId: user.$id,
+        workspaceId: project.workspaceId
+      })
+
+      if (!member) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
+
+      return c.json({ data: project })
+    }
+  )
+  .get(
+    '/:projectId/analytics',
+    sessionMiddleware,
+    async (c) => {
+      const databases = c.get('databases');
+      const user = c.get('user');
+      const { projectId } = c.req.param();
+
+      const project = await databases.getDocument<Project>(DATABASE_ID, PROJECTS_ID, projectId);
+
+      const member = await getMember({
+        databases,
+        userId: user.$id,
+        workspaceId: project.workspaceId
+      })
+
+      if (!member) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
+
+      const now = new Date();
+      const thisMonthStart = startOfMonth(now);
+      const thisMonthEnd = endOfMonth(now);
+      const lastMonthStart = startOfMonth(subMonths(now, 1));
+      const lastMonthEnd = endOfMonth(subMonths(now, 1));
+
+      const thisMonthTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString())
+        ]
+      )
+
+      const lastMonthTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString())
+        ]
+      )
+
+      const taskDifference = thisMonthTask.total - lastMonthTask.total;
+
+      const thisMonthAssignedTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.equal('assigneeId', member.$id),
+          Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
+        ]
+      )
+
+      const lastMonthAssignedTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.equal('assigneeId', member.$id),
+          Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
+        ]
+      )
+
+      const assignedTaskDifference = thisMonthAssignedTask.total - lastMonthAssignedTask.total;
+      
+      const thisMonthIncompleteTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.notEqual('status', TaskStatus.DONE),
+          Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
+        ]
+      )
+
+      const lastMonthIncompleteTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.notEqual('status', TaskStatus.DONE),
+          Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
+        ]
+      )
+
+      const incompleteTaskDifference = thisMonthIncompleteTask.total - lastMonthIncompleteTask.total;
+
+      const thisMonthCompleteTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.equal('status', TaskStatus.DONE),
+          Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
+        ]
+      )
+
+      const lastMonthCompleteTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.equal('status', TaskStatus.DONE),
+          Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
+        ]
+      )
+
+      const completeTaskDifference = thisMonthCompleteTask.total - lastMonthCompleteTask.total;
+
+      const thisMonthOverdueTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.notEqual('status', TaskStatus.DONE),
+          Query.lessThan('dueDate', now.toISOString()),
+          Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
+        ]
+      )
+
+      const lastMonthOverdueTask = await databases.listDocuments(
+        DATABASE_ID,
+        TASKS_ID,
+        [
+          Query.equal('projectId', projectId),
+          Query.notEqual('status', TaskStatus.DONE),
+          Query.lessThan('dueDate', now.toISOString()),
+          Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
+          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
+        ]
+      )
+
+      const overdueTaskDifference = thisMonthOverdueTask.total - lastMonthOverdueTask.total;
+
+      return c.json({ data: {
+        taskCount: thisMonthTask.total,
+        taskDifference,
+        assignedTaskCount: thisMonthAssignedTask.total,
+        assignedTaskDifference,
+        incompleteTaskCount: thisMonthIncompleteTask.total,
+        incompleteTaskDifference,
+        completeTaskCount: thisMonthCompleteTask.total,
+        completeTaskDifference,
+        overdueTaskCount: thisMonthOverdueTask.total,
+        overdueTaskDifference
+      }})
     }
   )
   .post(

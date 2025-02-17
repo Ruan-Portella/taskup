@@ -20,9 +20,10 @@ import DataCalendar from './data-calendar';
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
+  projectId: string;
 };
 
-export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcherProps) {
+export default function TaskViewSwitcher({ hideProjectFilter, projectId: projectIdData }: TaskViewSwitcherProps) {
   const [{
     status,
     assigneeId,
@@ -35,7 +36,7 @@ export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcher
   });
 
   const workspaceId = useWorkspacesId();
-  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId, projectId, dueDate });
+  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId, projectId: projectId || projectIdData, dueDate });
   const { open } = useCreateTaskModal();
 
   const {mutate: bulkUpdateTasks} = useBulkUpdateTasks();

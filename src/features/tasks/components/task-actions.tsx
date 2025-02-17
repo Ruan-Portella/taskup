@@ -2,7 +2,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useConfirm } from "@/hooks/use-confirm";
 import { ExternalLinkIcon, PencilIcon, TrashIcon } from "lucide-react";
 import { useDeleteTask } from "../api/use-delete-task";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useWorkspacesId } from "@/features/workspaces/hooks/use-workspaces-id";
 import { useEditTaskModal } from "../hooks/use-edit-task-modal";
 
@@ -15,8 +15,9 @@ interface TaskActionsProps {
 export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
   const workspaceId = useWorkspacesId();
   const router = useRouter();
+  const pathname = usePathname();
 
-  const {open} = useEditTaskModal();
+  const { open } = useEditTaskModal();
 
   const [ConfirmDialog, confirm] = useConfirm('Deletar Tarefa', 'Essa ação é irreversível.', 'destructive');
   const { mutate, isPending } = useDeleteTask();
@@ -49,11 +50,15 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
             <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
             Detalhes da Tarefa
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={onOpenProject}
-            className="font-medium p-[10px]">
-            <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
-            Abrir Projeto
-          </DropdownMenuItem>
+          {
+            pathname.includes('tasks') && (
+              <DropdownMenuItem onClick={onOpenProject}
+                className="font-medium p-[10px]">
+                <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
+                Abrir Projeto
+              </DropdownMenuItem>
+            )
+          }
           <DropdownMenuItem onClick={() => open(id)}
             className="font-medium p-[10px]">
             <PencilIcon className="size-4 mr-2 stroke-2" />

@@ -1,25 +1,26 @@
-import { getWorkspace } from '@/features/workspaces/api/get-workspace';
+'use client';
+
+import PageError from '@/components/page-error';
+import PageLoader from '@/components/page-loader';
+import { useGetWorkspace } from '@/features/workspaces/api/use-get-workspace';
 import { EditWorkspacesForm } from '@/features/workspaces/components/edit-workspaces-form';
-import { redirect } from 'next/navigation';
+import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import React from 'react'
 
-interface WorkspaceSettingsPageProps {
-  params: {
-    workspacesId: string
-  };
-}
+export default function WorkspaceSettingsPage() {
+  const workspacesId = useWorkspacesId();
+  const {data, isLoading} = useGetWorkspace({workspaceId: workspacesId})
 
-export default async function WorkspaceSettingsPage({ params }: WorkspaceSettingsPageProps) {
-  const {workspacesId} = await params;
-  const initialValues = await getWorkspace({ workspaceId: workspacesId });
-  
-  if (!initialValues) {
-    redirect(`/workspaces/${workspacesId}`);
+  if (isLoading) {
+    return <PageLoader />
   }
 
+  if (!data) {
+    return <PageError message="Área de Trabalho não encontrada" />
+  }
   return (
     <div className='w-full lg:max-w-xl'>
-      <EditWorkspacesForm initialValues={initialValues} />
+      <EditWorkspacesForm initialValues={data} />
     </div>
   )
 }

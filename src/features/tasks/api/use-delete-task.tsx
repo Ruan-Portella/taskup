@@ -2,13 +2,11 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import {client} from '@/lib/rpc';
-import { useRouter } from "next/navigation";
 
 type ResponseType = InferResponseType<typeof client.api.tasks[':taskId']['$delete'], 200>;
 type RequestType = InferRequestType<typeof client.api.tasks[':taskId']['$delete']>;
 
 export const useDeleteTask = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, unknown, RequestType>({
@@ -23,9 +21,9 @@ export const useDeleteTask = () => {
     },
     onSuccess: ({data}) => {
       toast.success('Tarefa deletada com sucesso!');
-      router.refresh();
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', data.taskId] });
+      queryClient.invalidateQueries({ queryKey: ['project-analytics', data.projectId] });
     },
     onError: () => {
       toast.error('Erro ao deletar tarefa');

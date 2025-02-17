@@ -1,17 +1,29 @@
+'use client';
+
+import PageError from '@/components/page-error';
+import PageLoader from '@/components/page-loader';
+import { useGetProject } from '@/features/projects/api/use-get-project';
 import { EditProjectForm } from '@/features/projects/components/edit-project-form';
-import { getProject } from '@/features/projects/queries'
+import { useProjectId } from '@/features/projects/hooks/use-project-id';
 import React from 'react'
 
-export default async function ProjectIdSettingsPage({
-  params
-}: { params: { projectId: string } }) {
-  const { projectId } = await params;
+export default function ProjectIdSettingsPage() {
+  const projectId = useProjectId();
+  const {data, isLoading} = useGetProject({
+    projectId: projectId
+  })
 
-  const initialValues = await getProject({ projectId });
+  if (isLoading) {
+    return <PageLoader />
+  }
+
+  if (!data) {
+    return <PageError message="Projeto não encontrado" />
+  }
 
   return (
     <div className='w-full lg:max-w-xl'>
-      <EditProjectForm initialValues={initialValues} />
+      <EditProjectForm initialValues={data} />
     </div>
   )
 }

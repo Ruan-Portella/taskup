@@ -2,13 +2,11 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import {client} from '@/lib/rpc';
-import { useRouter } from "next/navigation";
 
 type ResponseType = InferResponseType<typeof client.api.tasks[':taskId']['$patch'], 200>;
 type RequestType = InferRequestType<typeof client.api.tasks[':taskId']['$patch']>;
 
 export const useUpdateTask = () => {
-  const router = useRouter();
   const queryClient = useQueryClient();
 
   const mutation = useMutation<ResponseType, unknown, RequestType>({
@@ -21,11 +19,11 @@ export const useUpdateTask = () => {
 
       return await response.json();
     },
-    onSuccess: ({data}) => {
+    onSuccess: ({data, projectId}) => {
       toast.success('Tarefa atualizada com sucesso!');
-      router.refresh();
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', data.$id] });
+      queryClient.invalidateQueries({ queryKey: ['project-analytics', projectId] });
     },
     onError: () => {
       toast.error('Erro ao atualizar a tarefa');

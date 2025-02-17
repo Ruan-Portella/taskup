@@ -17,7 +17,6 @@ import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@
 import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { TaskStatus } from "../types";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
-import { useCreateTaskModal } from "../hooks/use-create-task-modal";
 
 interface CreateTaskFormProps {
   onCancel?: () => void;

@@ -1,24 +1,34 @@
+'use client';
+import Analytics from "@/components/analytics";
+import PageError from "@/components/page-error";
+import PageLoader from "@/components/page-loader";
 import { Button } from "@/components/ui/button"
+import { useGetProject } from "@/features/projects/api/use-get-project";
+import { useGetProjectAnalytics } from "@/features/projects/api/use-get-project-analytics";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar"
-import { getProject } from "@/features/projects/queries"
+import { useProjectId } from "@/features/projects/hooks/use-project-id"
 import TaskViewSwitcher from "@/features/tasks/components/task-view-switcher"
 import { Pencil } from "lucide-react"
 import Link from "next/link"
 
-interface ProjectIdPageProps {
-  params: Promise<{ projectId: string }>;
-}
-
-export default async function ProjectIdPage({
-  params
-}: ProjectIdPageProps) {
-  const { projectId } = await params
-  const initialValues = await getProject({
+export default function ProjectIdPage() {
+  const projectId = useProjectId()
+  
+  const { data: project, isLoading: isLoadingProject } = useGetProject({
+    projectId: projectId
+  })
+  const { data: analytics, isLoading: isLoadingAnalytics } = useGetProjectAnalytics({
     projectId: projectId
   })
 
-  if (!initialValues) {
-    throw new Error('Projeto não encontrado')
+  const isLoading = isLoadingProject || isLoadingAnalytics
+
+  if (isLoading) {
+    return <PageLoader />
+  }
+
+  if (!project) {
+    return <PageError message="Projeto não encontrado" />
   }
 
   return (
@@ -26,22 +36,27 @@ export default async function ProjectIdPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <ProjectAvatar
-            name={initialValues.name}
-            image={initialValues.imageUrl}
+            name={project.name}
+            image={project.imageUrl}
             className="size-6"
           />
-          <p className="text-lg font-semibold">{initialValues.name}</p>
+          <p className="text-lg font-semibold">{project.name}</p>
         </div>
         <div>
           <Button variant='secondary' size='sm' asChild>
-            <Link href={`/workspaces/${initialValues.workspaceId}/projects/${initialValues.$id}/settings`}>
+            <Link href={`/workspaces/${project.workspaceId}/projects/${project.$id}/settings`}>
               <Pencil className="size-4" />
               Editar Projeto
             </Link>
           </Button>
         </div>
       </div>
-      <TaskViewSwitcher hideProjectFilter />
+      {
+        analytics && (
+          <Analytics data={analytics} />
+        )
+      }
+      <TaskViewSwitcher hideProjectFilter projectId={projectId} />
     </div>
   )
 }

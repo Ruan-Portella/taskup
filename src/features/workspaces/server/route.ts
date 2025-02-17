@@ -12,36 +12,85 @@ import { z } from "zod";
 import { Workspace } from "../types/workspace";
 
 const app = new Hono()
-.get('/', 
-  sessionMiddleware,
-  async (c) => {
-    const user = c.get("user");
-    const databases = c.get("databases");
+  .get('/',
+    sessionMiddleware,
+    async (c) => {
+      const user = c.get("user");
+      const databases = c.get("databases");
 
-    const members = await databases.listDocuments(
-      DATABASE_ID,
-      MEMBERS_ID,
-      [Query.equal('userId', user.$id)]
-    );
+      const members = await databases.listDocuments(
+        DATABASE_ID,
+        MEMBERS_ID,
+        [Query.equal('userId', user.$id)]
+      );
 
-    if (members.total === 0) {
-      return c.json({ data: {documents: [], total: 0} })
+      if (members.total === 0) {
+        return c.json({ data: { documents: [], total: 0 } })
+      }
+
+      const workspacesIds = members.documents.map((member) => member.workspaceId);
+
+      const workspaces = await databases.listDocuments(
+        DATABASE_ID,
+        WORKSPACE_ID,
+        [
+          Query.orderDesc('$createdAt'),
+          Query.contains('$id', workspacesIds)
+        ]
+      );
+
+      return c.json({ data: workspaces })
     }
+  )
+  .get(
+    '/:workspaceId',
+    sessionMiddleware,
+    async (c) => {
+      const databases = c.get("databases");
+      const user = c.get("user");
+      const { workspaceId } = c.req.param();
 
-    const workspacesIds = members.documents.map((member) => member.workspaceId);
+      const member = await getMember({
+        databases,
+        userId: user.$id,
+        workspaceId
+      })
 
-    const workspaces = await databases.listDocuments(
-      DATABASE_ID,
-      WORKSPACE_ID,
-      [
-        Query.orderDesc('$createdAt'),
-        Query.contains('$id', workspacesIds)
-      ]
-    );
+      if (!member) {
+        return c.json({ error: 'Unauthorized' }, 401)
+      }
 
-    return c.json({ data: workspaces })
-  }
-)
+      const workspace = await databases.getDocument<Workspace>(
+        DATABASE_ID,
+        WORKSPACE_ID,
+        workspaceId
+      )
+
+      return c.json({ data: workspace })
+    }
+  )
+  .get(
+    '/:workspaceId/info',
+    sessionMiddleware,
+    async (c) => {
+      const databases = c.get("databases");
+      const { workspaceId } = c.req.param();
+
+      const workspace = await databases.getDocument<Workspace>(
+        DATABASE_ID,
+        WORKSPACE_ID,
+        workspaceId
+      )
+
+      return c.json({
+        data: {
+          $id: workspace.$id,
+          name: workspace.name,
+          imageUrl: workspace.imageUrl
+        }
+      })
+    }
+  )
   .post(
     '/',
     zValidator('form', createWorkspaceSchema),
@@ -117,7 +166,7 @@ const app = new Hono()
       })
 
       if (!member || member.role !== MemberRole.ADMIN) {
-        return c.json({error: 'Unauthorized'}, 401)
+        return c.json({ error: 'Unauthorized' }, 401)
       }
 
       let uploadedImageUrl: string | undefined;
@@ -167,7 +216,7 @@ const app = new Hono()
       })
 
       if (!member || member.role !== MemberRole.ADMIN) {
-        return c.json({error: 'Unauthorized'}, 401)
+        return c.json({ error: 'Unauthorized' }, 401)
       }
 
       // Delete all members, projects, tasks
@@ -196,7 +245,7 @@ const app = new Hono()
       })
 
       if (!member || member.role !== MemberRole.ADMIN) {
-        return c.json({error: 'Unauthorized'}, 401)
+        return c.json({ error: 'Unauthorized' }, 401)
       }
 
       const workspace = await databases.updateDocument(
@@ -214,10 +263,10 @@ const app = new Hono()
   .post(
     '/:workspaceId/join',
     sessionMiddleware,
-    zValidator('json', z.object({code: z.string()})),
+    zValidator('json', z.object({ code: z.string() })),
     async (c) => {
-      const {workspaceId} = c.req.param();
-      const {code} = c.req.valid('json');
+      const { workspaceId } = c.req.param();
+      const { code } = c.req.valid('json');
 
       const databases = c.get('databases');
       const user = c.get('user');
@@ -227,9 +276,9 @@ const app = new Hono()
         userId: user.$id,
         workspaceId
       })
-      
+
       if (member) {
-        return c.json({error: 'Already a member'}, 400)
+        return c.json({ error: 'Already a member' }, 400)
       }
 
       const workspace = await databases.getDocument<Workspace>(
@@ -239,7 +288,7 @@ const app = new Hono()
       );
 
       if (workspace.inviteCode !== code) {
-        return c.json({error: 'Invalid code'}, 400)
+        return c.json({ error: 'Invalid code' }, 400)
       }
 
       await databases.createDocument(

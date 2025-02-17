@@ -1,5 +1,4 @@
 import { AppSidebar } from "@/components/sidebar";
-import { Header } from "@/components/header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { CreateWorkspacesForm } from "@/features/workspaces/components/create-workspaces-form";
 import { CreateProjectModal } from "@/features/projects/components/create-project-modal";

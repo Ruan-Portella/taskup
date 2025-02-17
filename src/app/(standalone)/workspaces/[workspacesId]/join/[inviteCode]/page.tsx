@@ -1,28 +1,32 @@
-import { getWorkspaceInfo } from '@/features/workspaces/api/get-workspace';
+'use client';
+
+import PageError from '@/components/page-error';
+import PageLoader from '@/components/page-loader';
+import { useGetWorkspaceInfo } from '@/features/workspaces/api/use-get-workspace-info';
 import { JoinWorkspaceForm } from '@/features/workspaces/components/join-workspace-form';
-import { redirect } from 'next/navigation';
+import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import React from 'react'
 
-interface InviteCodePageProps {
-  params:  Promise<{ workspacesId: string}>;
-}
 
-export default async function InviteCodePage({
-  params,
-}: InviteCodePageProps) {
-  const { workspacesId } = await params;
+export default function InviteCodePage() {
+  const workspaceId = useWorkspacesId();
 
-  const initialValues = await getWorkspaceInfo({
-    workspaceId: workspacesId,
+  const { data, isLoading } = useGetWorkspaceInfo({
+    workspaceId: workspaceId,
   })
 
-  if (!initialValues) {
-    redirect('/');
-  };
+  if (isLoading) {
+    return <PageLoader />
+  }
+
+  if (!data) {
+    return <PageError message="Área de Trabalho não encontrada" />
+  }
+
 
   return (
     <div className='w-full lg:max-w-xl'>
-      <JoinWorkspaceForm initialValues={initialValues} />
+      <JoinWorkspaceForm initialValues={data} />
     </div>
   )
 }
