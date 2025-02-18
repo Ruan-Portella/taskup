@@ -13,6 +13,7 @@ export default function InviteCodePage() {
 
   const { data, isLoading } = useGetWorkspaceInfo({
     workspaceId: workspaceId,
+    inviteCode: true
   })
 
   if (isLoading) {

@@ -47,10 +47,12 @@ const app = new Hono()
   .get(
     '/:workspaceId',
     sessionMiddleware,
+    zValidator('query', z.object({ inviteCode: z.boolean().optional() })),
     async (c) => {
       const databases = c.get("databases");
       const user = c.get("user");
       const { workspaceId } = c.req.param();
+      const { inviteCode } = c.req.valid('query');
 
       const member = await getMember({
         databases,
@@ -58,7 +60,7 @@ const app = new Hono()
         workspaceId
       })
 
-      if (!member) {
+      if (!member && !inviteCode) {
         return c.json({ error: 'Unauthorized' }, 401)
       }
 
