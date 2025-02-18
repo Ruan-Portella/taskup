@@ -21,6 +21,7 @@ export async function middleware(request: NextRequest) {
 
   console.log(nextUrl.pathname)
   console.log(nextJoinUrl)
+  console.log(isLoggedIn)
 
   if (nextUrl.pathname.includes('/join') && !isLoggedIn) {
     nextJoinUrl = nextUrl.pathname
