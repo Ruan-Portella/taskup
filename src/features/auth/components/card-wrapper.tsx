@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub } from 'react-icons/fa'
 import Link from 'next/link'
+import { signUpWithGithub, signUpWithGoogle } from '@/lib/oauth'
 
 
 interface CardWrapperProps {
@@ -65,11 +66,11 @@ export default function CardWrapper({
       {
         social && (
           <CardContent className='p-7 pb-0 flex gap-x-4'>
-            <Button disabled={isPending} variant='secondary' size='lg' className='w-1/2'>
+            <Button disabled={isPending} variant='secondary' size='lg' className='w-1/2' onClick={() => signUpWithGoogle()}>
               <FcGoogle />
               Entrar com Google
             </Button>
-            <Button disabled={isPending} variant='secondary' size='lg' className='w-1/2'>
+            <Button disabled={isPending} variant='secondary' size='lg' className='w-1/2' onClick={() => signUpWithGithub()}>
               <FaGithub />
               Entrar com Github
             </Button>

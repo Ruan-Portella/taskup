@@ -1,5 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { getUser } from './features/auth/api/get-user';
+import { AUTH_COOKIE } from './features/auth/server/route';
 
 const authRoutes = [
   '/sign-in',
@@ -7,15 +8,15 @@ const authRoutes = [
 ]
 
 export async function middleware(request: NextRequest) {
-  const {nextUrl} = request;
-  const isLoggedIn = await getUser()
+  const { nextUrl } = request;
 
-  const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth');
+  const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth') || nextUrl.pathname.startsWith('/oauth');
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   if (isApiAuthRoute) {
     return null;
   }
+  const isLoggedIn = await getUser()
 
   if (isAuthRoute) {
     if (isLoggedIn) {
