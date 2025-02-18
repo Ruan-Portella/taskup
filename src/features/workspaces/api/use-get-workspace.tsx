@@ -11,7 +11,7 @@ export const useGetWorkspace= ({
   const query = useQuery({
     queryKey: ['workspace', workspaceId],
     queryFn: async () => {
-      const response = await client.api.workspaces[':workspaceId'].$get({param: {workspaceId}, query: {}});
+      const response = await client.api.workspaces[':workspaceId'].$get({param: {workspaceId}});
 
       if (!response.ok) {
         throw new Error('Erro ao buscar a área de trabalho');

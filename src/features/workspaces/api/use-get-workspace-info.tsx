@@ -8,12 +8,11 @@ interface useGetWorkspaceInfoProps {
 
 export const useGetWorkspaceInfo= ({
   workspaceId,
-  inviteCode = false
 }: useGetWorkspaceInfoProps) => {
   const query = useQuery({
     queryKey: ['workspace-info', workspaceId],
     queryFn: async () => {
-      const response = await client.api.workspaces[':workspaceId'].$get({param: {workspaceId}, query: {inviteCode: inviteCode ? String(inviteCode) : undefined}});
+      const response = await client.api.workspaces[':workspaceId']['info'].$get({param: {workspaceId}});
 
       if (!response.ok) {
         throw new Error('Erro ao buscar a área de trabalho');
