@@ -19,18 +19,24 @@ export async function middleware(request: NextRequest) {
   }
   const isLoggedIn = await getUser()
 
+  console.log(nextUrl.pathname)
+  console.log(nextJoinUrl)
+
   if (nextUrl.pathname.includes('/join') && !isLoggedIn) {
     nextJoinUrl = nextUrl.pathname
     return Response.redirect(new URL('/sign-in', nextUrl));
   }
 
+  if (isLoggedIn) {
+    if (nextJoinUrl) {
+      const nextUrlJoin = new URL(nextJoinUrl, nextUrl)
+      nextJoinUrl = '';
+      return Response.redirect(nextUrlJoin)
+    }
+  }
+
   if (isAuthRoute) {
     if (isLoggedIn) {
-      if (nextJoinUrl) {
-        const nextUrlJoin = new URL(nextJoinUrl, nextUrl)
-        nextJoinUrl = '';
-        return Response.redirect(nextUrlJoin);
-      }
       return Response.redirect(new URL('/', nextUrl));
     }
     return null;
