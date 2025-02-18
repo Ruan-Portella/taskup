@@ -3,6 +3,7 @@ import { getUser } from './features/auth/api/get-user';
 const authRoutes = [
   '/sign-in',
   '/sign-up',
+  '/authenticator'
 ]
 
 let nextJoinUrl = ''

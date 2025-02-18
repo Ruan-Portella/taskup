@@ -17,6 +17,8 @@ export async function GET(request: NextRequest) {
   const session = await account.createSession(userId, secret);
   const cookiesA = await cookies();
 
+  console.log("Setting cookie", session.secret);
+
   cookiesA.set(AUTH_COOKIE, session.secret, {
     path: "/",
     httpOnly: true,
@@ -24,5 +26,5 @@ export async function GET(request: NextRequest) {
     secure: true, 
   });
 
-  return NextResponse.redirect(`${request.nextUrl.origin}/`);
+  return NextResponse.redirect(`${request.nextUrl.origin}/authenticator?code=dascx12621xbsa21`);
 }
