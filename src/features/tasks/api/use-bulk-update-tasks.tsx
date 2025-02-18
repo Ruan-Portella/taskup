@@ -23,6 +23,7 @@ export const useBulkUpdateTasks = () => {
       toast.success('Tarefas atualizadas com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['project-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['workspace-analytics'] });
     },
     onError: () => {
       toast.error('Erro ao atualizar as tarefas');

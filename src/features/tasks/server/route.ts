@@ -147,7 +147,7 @@ const app = new Hono()
         }
       );
 
-      return c.json({ data: task, projectId });
+      return c.json({ data: task, projectId, workspaceId });
     }
   )
   .patch(
@@ -195,7 +195,7 @@ const app = new Hono()
         }
       );
 
-      return c.json({ data: task, projectId });
+      return c.json({ data: task, projectId, workspaceId: existingTask.workspaceId });
     }
   )
   .delete(
@@ -225,7 +225,7 @@ const app = new Hono()
 
       await databases.deleteDocument(DATABASE_ID, TASKS_ID, taskId);
 
-      return c.json({ data: { taskId, projectId: task.projectId } });
+      return c.json({ data: { taskId, projectId: task.projectId, workspaceId: task.workspaceId } });
     }
   )
   .get(

@@ -56,7 +56,7 @@ export default function ProjectIdPage() {
           <Analytics data={analytics} />
         )
       }
-      <TaskViewSwitcher hideProjectFilter projectId={projectId} />
+      <TaskViewSwitcher hideProjectFilter />
     </div>
   )
 }

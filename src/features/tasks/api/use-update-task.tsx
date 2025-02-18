@@ -19,11 +19,12 @@ export const useUpdateTask = () => {
 
       return await response.json();
     },
-    onSuccess: ({data, projectId}) => {
+    onSuccess: ({data, projectId, workspaceId}) => {
       toast.success('Tarefa atualizada com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', data.$id] });
       queryClient.invalidateQueries({ queryKey: ['project-analytics', projectId] });
+      queryClient.invalidateQueries({ queryKey: ['workspace-analytics', workspaceId] });
     },
     onError: () => {
       toast.error('Erro ao atualizar a tarefa');

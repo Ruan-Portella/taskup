@@ -17,13 +17,13 @@ import DataKanban from './data-kanban';
 import { TaskStatus } from '../types';
 import { useBulkUpdateTasks } from '../api/use-bulk-update-tasks';
 import DataCalendar from './data-calendar';
+import { useProjectId } from '@/features/projects/hooks/use-project-id';
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
-  projectId: string;
 };
 
-export default function TaskViewSwitcher({ hideProjectFilter, projectId: projectIdData }: TaskViewSwitcherProps) {
+export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcherProps) {
   const [{
     status,
     assigneeId,
@@ -35,8 +35,10 @@ export default function TaskViewSwitcher({ hideProjectFilter, projectId: project
     defaultValue: 'table',
   });
 
+  const defaultProjectId = useProjectId();
+
   const workspaceId = useWorkspacesId();
-  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId, projectId: projectId || projectIdData, dueDate });
+  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId, projectId: projectId || defaultProjectId, dueDate });
   const { open } = useCreateTaskModal();
 
   const {mutate: bulkUpdateTasks} = useBulkUpdateTasks();

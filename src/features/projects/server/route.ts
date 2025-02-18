@@ -28,7 +28,7 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const projects = await databases.listDocuments(
+      const projects = await databases.listDocuments<Project>(
         DATABASE_ID,
         PROJECTS_ID,
         [
@@ -111,6 +111,8 @@ const app = new Hono()
 
       const taskDifference = thisMonthTask.total - lastMonthTask.total;
 
+      console.log(thisMonthTask.documents[0])
+      console.log(member.$id)
       const thisMonthAssignedTask = thisMonthTask.documents.filter(task => task.assigneeId === member.$id).length;
 
       // const thisMonthAssignedTask = await databases.listDocuments(
