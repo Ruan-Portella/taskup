@@ -1,6 +1,5 @@
 import { type NextRequest } from 'next/server'
 import { getUser } from './features/auth/api/get-user';
-import { AUTH_COOKIE } from './features/auth/server/route';
 
 const authRoutes = [
   '/sign-in',
