@@ -20,9 +20,8 @@ export default function InviteCodePage() {
   }
 
   if (!data) {
-    return <PageError message="Área de Trabalho não encontrada" />
+    return <PageError message="Área de Trabalho não encontrada ou você já está participando." hrefBack='/' />
   }
-
 
   return (
     <div className='w-full lg:max-w-xl'>

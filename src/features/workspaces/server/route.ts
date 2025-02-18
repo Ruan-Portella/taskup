@@ -76,7 +76,18 @@ const app = new Hono()
     sessionMiddleware,
     async (c) => {
       const databases = c.get("databases");
+      const user = c.get("user");
       const { workspaceId } = c.req.param();
+
+      const member = await getMember({
+        databases,
+        userId: user.$id,
+        workspaceId
+      })
+
+      if (member) {
+        return c.json({ error: 'Already a member' }, 400)
+      }
 
       const workspace = await databases.getDocument<Workspace>(
         DATABASE_ID,

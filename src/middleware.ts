@@ -1,10 +1,11 @@
 import { type NextRequest } from 'next/server'
 import { getUser } from './features/auth/api/get-user';
-
 const authRoutes = [
   '/sign-in',
   '/sign-up',
 ]
+
+let nextJoinUrl = ''
 
 export async function middleware(request: NextRequest) {
   const { nextUrl } = request;
@@ -17,8 +18,18 @@ export async function middleware(request: NextRequest) {
   }
   const isLoggedIn = await getUser()
 
+  if (nextUrl.pathname.includes('/join') && !isLoggedIn) {
+    nextJoinUrl = nextUrl.pathname
+    return Response.redirect(new URL('/sign-in', nextUrl));
+  }
+
   if (isAuthRoute) {
     if (isLoggedIn) {
+      if (nextJoinUrl) {
+        const nextUrlJoin = new URL(nextJoinUrl, nextUrl)
+        nextJoinUrl = '';
+        return Response.redirect(nextUrlJoin);
+      }
       return Response.redirect(new URL('/', nextUrl));
     }
     return null;
