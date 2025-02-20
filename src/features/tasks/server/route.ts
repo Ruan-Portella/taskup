@@ -157,7 +157,7 @@ const app = new Hono()
       );
 
       if (parentTaskId) {
-        const subtasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, [
+        const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
           Query.equal("parentTaskId", parentTaskId),
         ]);
 
@@ -215,7 +215,7 @@ const app = new Hono()
           completionPercentage = 100;
         }
       } else {
-        const subtasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, [
+        const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
           Query.equal("parentTaskId", taskId),
         ]);
 
@@ -247,7 +247,7 @@ const app = new Hono()
       );
 
       if (parentTaskId) {
-        const subtasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, [
+        const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
           Query.equal("parentTaskId", parentTaskId),
         ]);
 
@@ -293,7 +293,7 @@ const app = new Hono()
       }
 
       if (task.parentTaskId) {
-          const subtasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, [
+          const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
             Query.equal("parentTaskId", task.parentTaskId),
           ]);
   
@@ -308,7 +308,7 @@ const app = new Hono()
             status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS, 
           });
       } else {
-        const subtasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, [
+        const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
           Query.equal("parentTaskId", taskId),
         ]);
 
@@ -348,7 +348,7 @@ const app = new Hono()
         return c.json({ error: 'You are not a member of this workspace' }, 403);
       }
 
-      const subtasks = await databases.listDocuments(DATABASE_ID, TASKS_ID, [
+      const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
         Query.equal("parentTaskId", taskId)
       ]);      
 

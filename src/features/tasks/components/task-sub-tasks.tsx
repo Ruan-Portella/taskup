@@ -14,7 +14,7 @@ import { TaskActions } from './task-actions';
 
 interface TaskSubTasksProps {
   task: Task;
-};
+}
 
 interface TaskListProps {
   data: Task[];

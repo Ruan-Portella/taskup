@@ -38,7 +38,8 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
       workspaceId,
       status,
       projectId,
-      assigneeId
+      assigneeId,
+      dueDate: new Date(),
     }
   })
 
@@ -118,7 +119,6 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
                               <SelectValue placeholder="Selecione um responsável" />
                             </SelectTrigger>
                           </FormControl>
-                          <FormMessage />
                           <SelectContent>
                             {memberOptions.map(member => (
                               <SelectItem key={member.id} value={member.id}>
@@ -153,7 +153,6 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
                           <SelectValue placeholder="Selecione um status" />
                         </SelectTrigger>
                       </FormControl>
-                      <FormMessage />
                       <SelectContent>
                         <SelectItem value={TaskStatus.BACKLOG}>
                           Pendente
@@ -192,7 +191,6 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
                               <SelectValue placeholder="Selecione um projeto" />
                             </SelectTrigger>
                           </FormControl>
-                          <FormMessage />
                           <SelectContent>
                             {projectOptions.map(project => (
                               <SelectItem key={project.id} value={project.id}>

@@ -31,7 +31,7 @@ export default function TaskIdPage() {
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-4'>
         <TaskOverview task={{...data, subtasks: undefined}} />
         <TaskDescription task={{...data, subtasks: undefined}} />
-        <TaskSubTasks task={{...data, subtasks: undefined}} />
+        <TaskSubTasks task={data} />
       </div>
     </div>
   )
