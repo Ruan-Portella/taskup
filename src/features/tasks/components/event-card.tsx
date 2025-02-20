@@ -7,8 +7,7 @@ import { ProjectAvatar } from '@/features/projects/components/project-avatar';
 import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import { useRouter } from 'next/navigation';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { CircularProgress } from '@/components/circular-progress';
-import { AlertTriangleIcon } from 'lucide-react';
+import { AlertTriangleIcon, LaptopMinimalCheckIcon } from 'lucide-react';
 
 interface EventCardProps {
   title: string;
@@ -54,28 +53,31 @@ export default function EventCard({ title, assignee, project, status, id, comple
             image={project?.imageUrl}
           />
           <div className='size-1 rounded-full bg-neutral-300' />
-        <div className='mt-0.5'>
-          <TooltipProvider>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger className='flex items-center'>
-                <CircularProgress percentage={completionPercentage || 0} />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {completionPercentage}% concluído
-                </p>
-                {
-                  subtasks && subtasks.total > 0 && (
-                    <p className='text-xs flex gap-1'>
-                      <AlertTriangleIcon className='size-4' />
-                      Esta tarefa possui subtarefas pendentes.
-                    </p>
-                  )
-                }
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+          <div className='mt-0.5'>
+            <p>
+              {completionPercentage}% concluído
+            </p>
+          </div>
+          {
+            subtasks && subtasks?.total > 0 && (
+              <>
+                <div className='size-1 rounded-full bg-neutral-300' />
+                <TooltipProvider>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger className='flex items-center'>
+                      <LaptopMinimalCheckIcon className='size-5 mr-1 text-black' />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className='text-xs flex gap-1'>
+                        <AlertTriangleIcon className='size-4' />
+                        Esta tarefa possui subtarefas.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
+            )
+          }
         </div>
       </div>
     </div>

@@ -77,7 +77,7 @@ export default function DataKanban({ data, onChange }: DataKanbanProps) {
     const sourceStatus = source.droppableId as TaskStatus;
     const destinationStatus = destination.droppableId as TaskStatus;
 
-    let updatesPayload: {$id: string, status: TaskStatus, position: number}[] = [];
+    let updatesPayload: {$id: string, status: TaskStatus, position: number, parentTaskId?: string}[] = [];
 
     setTasks((prevTasks) => {
       const newTasks = { ...prevTasks };
@@ -111,7 +111,8 @@ export default function DataKanban({ data, onChange }: DataKanbanProps) {
       updatesPayload.push({
         $id: updatedMovedTask.$id,
         status: destinationStatus,
-        position: Math.min((destination.index + 1) * 1000, 1_000_000)
+        position: Math.min((destination.index + 1) * 1000, 1_000_000),
+        parentTaskId: updatedMovedTask.subtasks && updatedMovedTask.subtasks?.total > 0 ? updatedMovedTask.$id : undefined
       });
 
       // Atualiza a posição das tarefas restantes na coluna de destino
@@ -122,7 +123,8 @@ export default function DataKanban({ data, onChange }: DataKanbanProps) {
             updatesPayload.push({
               $id: task.$id,
               status: destinationStatus,
-              position: newPosition
+              position: newPosition,
+              parentTaskId: task.subtasks && task.subtasks?.total > 0 ? task.$id : undefined
             });
           }
         }
@@ -137,7 +139,8 @@ export default function DataKanban({ data, onChange }: DataKanbanProps) {
               updatesPayload.push({
                 $id: task.$id,
                 status: destinationStatus,
-                position: newPosition
+                position: newPosition,
+                parentTaskId: task.subtasks && task.subtasks?.total > 0 ? task.$id : undefined
               });
             }
           }

@@ -23,7 +23,7 @@ export default function LoadingAuth() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 3000)); // Aguarda 1 segundo
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       router.replace("/");
     };
 

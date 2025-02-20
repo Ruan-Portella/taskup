@@ -1,7 +1,7 @@
 import React from 'react'
 import { Task } from '../types'
 import { TaskActions } from './task-actions';
-import { AlertTriangleIcon, MoreHorizontal } from 'lucide-react';
+import { AlertTriangleIcon, LaptopMinimalCheckIcon, MoreHorizontal } from 'lucide-react';
 import { DottedSeparator } from '@/components/dotted-separator';
 import { MemberAvatar } from '@/features/members/components/member-avatar';
 import TaskDate from './task-date';
@@ -45,27 +45,28 @@ export default function KanbanCard({
         </span>
         <div className='size-1 rounded-full bg-neutral-300' />
         <div className='mt-0.5'>
-          <TooltipProvider>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger className='flex items-center'>
-                <CircularProgress percentage={task.completionPercentage || 0}  />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {task.completionPercentage}% concluído
-                </p>
-                {
-                  task.subtasks && task.subtasks.total > 0 && (
+          <CircularProgress percentage={task.completionPercentage || 0} />
+        </div>
+        {
+          task.subtasks && task.subtasks?.total > 0 && (
+            <>
+              <div className='size-1 rounded-full bg-neutral-300' />
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger className='flex items-center'>
+                    <LaptopMinimalCheckIcon className='size-5 mr-1 text-black' />
+                  </TooltipTrigger>
+                  <TooltipContent>
                     <p className='text-xs flex gap-1'>
                       <AlertTriangleIcon className='size-4' />
-                      Esta tarefa possui subtarefas pendentes.
+                      Esta tarefa possui subtarefas.
                     </p>
-                  )
-                }
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </>
+          )
+        }
       </div>
     </div >
   );

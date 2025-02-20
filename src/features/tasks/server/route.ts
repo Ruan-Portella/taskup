@@ -165,15 +165,17 @@ const app = new Hono()
           Query.equal("parentTaskId", parentTaskId),
         ]);
 
-        if (subtasks.total === 0) return c.json({ data: task, projectId, workspaceId: workspaceId, parentTaskId });
+        const parentTask = await databases.getDocument<Task>(DATABASE_ID, TASKS_ID, parentTaskId);
 
-        const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length;
+        if (subtasks.total === 0) return c.json({ data: task, projectId, workspaceId, parentTaskId });
 
-        const completionPercentage = Math.round((completedSubtasks / subtasks.total) * 100);
+        const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length + (parentTask.status === TaskStatus.DONE ? 1 : 0);
+
+        const completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
 
         await databases.updateDocument(DATABASE_ID, TASKS_ID, parentTaskId, {
-          completionPercentage, 
-          status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS, 
+          completionPercentage,
+          status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS,
         });
       }
 
@@ -224,9 +226,9 @@ const app = new Hono()
         ]);
 
         if (subtasks.total > 0) {
-          const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length;
+          const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length + (status === TaskStatus.DONE ? 1 : 0);
 
-          completionPercentage = Math.round((completedSubtasks / subtasks.total) * 100);
+          completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
         } else {
           if (status === TaskStatus.DONE) {
             completionPercentage = 100;
@@ -255,15 +257,17 @@ const app = new Hono()
           Query.equal("parentTaskId", parentTaskId),
         ]);
 
+        const parentTask = await databases.getDocument<Task>(DATABASE_ID, TASKS_ID, parentTaskId);
+
         if (subtasks.total === 0) return c.json({ data: task, projectId, workspaceId: existingTask.workspaceId, parentTaskId });
 
-        const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length;
+        const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length + (parentTask.status === TaskStatus.DONE ? 1 : 0);
 
-        const completionPercentage = Math.round((completedSubtasks / subtasks.total) * 100);
+        const completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
 
         await databases.updateDocument(DATABASE_ID, TASKS_ID, parentTaskId, {
-          completionPercentage, 
-          status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS, 
+          completionPercentage,
+          status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS,
         });
       }
 
@@ -296,21 +300,25 @@ const app = new Hono()
         return c.json({ error: 'You are not a member of this workspace' }, 403);
       }
 
+      await databases.deleteDocument(DATABASE_ID, TASKS_ID, taskId);
+
       if (task.parentTaskId) {
-          const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
-            Query.equal("parentTaskId", task.parentTaskId),
-          ]);
-  
-          if (subtasks.total === 0) return c.json({ data: task, taskId, projectId: task.projectId, workspaceId: task.workspaceId, parentTaskId: task.parentTaskId });
-  
-          const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length;
-  
-          const completionPercentage = Math.round((completedSubtasks / subtasks.total) * 100);
-  
-          await databases.updateDocument(DATABASE_ID, TASKS_ID, task.parentTaskId, {
-            completionPercentage, 
-            status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS, 
-          });
+        const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
+          Query.equal("parentTaskId", task.parentTaskId),
+        ]);
+
+        const parentTask = await databases.getDocument<Task>(DATABASE_ID, TASKS_ID, task.parentTaskId);
+
+        if (subtasks.total === 0) return c.json({ data: task, projectId: task.projectId, workspaceId: task.workspaceId, parentTaskId: task.parentTaskId });
+
+        const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length + (parentTask.status === TaskStatus.DONE ? 1 : 0);
+
+        const completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
+
+        await databases.updateDocument(DATABASE_ID, TASKS_ID, task.parentTaskId, {
+          completionPercentage,
+          status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS,
+        });
       } else {
         const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
           Query.equal("parentTaskId", taskId),
@@ -325,9 +333,8 @@ const app = new Hono()
         }
       }
 
-      await databases.deleteDocument(DATABASE_ID, TASKS_ID, taskId);
 
-      return c.json({ data: { taskId, projectId: task.projectId, workspaceId: task.workspaceId, parentTaskId: task.parentTaskId  } });
+      return c.json({ data: { taskId, projectId: task.projectId, workspaceId: task.workspaceId, parentTaskId: task.parentTaskId } });
     }
   )
   .get(
@@ -354,7 +361,7 @@ const app = new Hono()
 
       const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
         Query.equal("parentTaskId", taskId)
-      ]);      
+      ]);
 
       const project = await databases.getDocument<Project>(DATABASE_ID, PROJECTS_ID, task.projectId);
 
@@ -385,7 +392,8 @@ const app = new Hono()
       tasks: z.array(z.object({
         $id: z.string(),
         status: z.nativeEnum(TaskStatus),
-        position: z.number().int().positive().min(1000).max(1_000_000)
+        position: z.number().int().positive().min(1000).max(1_000_000),
+        parentTaskId: z.string().nullish(),
       }))
     })),
     async (c) => {
@@ -419,7 +427,24 @@ const app = new Hono()
 
       const updatedTasks = await Promise.all(
         tasks.map(async (task) => {
-          const { $id, status, position } = task;
+          const { $id, status, position, parentTaskId } = task;
+
+          if (parentTaskId) {
+            const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
+              Query.equal("parentTaskId", parentTaskId),
+            ]);
+    
+            if (subtasks.total === 0) return c.json({ data: task });
+    
+            const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length + (status === TaskStatus.DONE ? 1 : 0);
+    
+            const completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
+
+            await databases.updateDocument(DATABASE_ID, TASKS_ID, parentTaskId, {
+              completionPercentage,
+              status: completionPercentage === 100 ? TaskStatus.DONE : TaskStatus.IN_PROGRESS,
+            });
+          }
 
           return databases.updateDocument<Task>(
             DATABASE_ID,

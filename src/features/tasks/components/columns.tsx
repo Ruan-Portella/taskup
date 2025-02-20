@@ -2,7 +2,7 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { Task, TaskStatus } from '../types';
 import { Button } from '@/components/ui/button';
-import { AlertTriangleIcon, ArrowUp, ArrowUpDown, MoreVertical } from 'lucide-react';
+import { AlertTriangleIcon, ArrowUp, ArrowUpDown, LaptopMinimalCheckIcon, MoreVertical } from 'lucide-react';
 import { ProjectAvatar } from '@/features/projects/components/project-avatar';
 import { MemberAvatar } from '@/features/members/components/member-avatar';
 import TaskDate from './task-date';
@@ -258,13 +258,36 @@ export const columns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       let completionPercentage = 0;
+      let hasSubTasks = false;
+
+      if (row.original.subtasks && row.original.subtasks.total > 0) {
+        hasSubTasks = true;
+      };
 
       if (row.original.completionPercentage) {
         completionPercentage = row.original.completionPercentage;
       };
 
       return (
-        <CircularProgress percentage={completionPercentage} />
+        <div className='flex items-center gap-x-2'>
+          {
+            hasSubTasks && (
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger className='flex items-center'>
+                    <LaptopMinimalCheckIcon className='size-5 mr-1 text-black' />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>
+                      Esta tarefa possui subtarefas.
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )
+          }
+          <CircularProgress percentage={completionPercentage} />
+        </div>
       )
     },
   },
