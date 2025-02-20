@@ -37,7 +37,7 @@ export default function TaskSubTasks({ task }: TaskSubTasksProps) {
         <p className='text-lg font-semibold' >
           Sub Tarefas ({task.subtasks?.total || 0})
         </p>
-        <Button onClick={() => openSubTask({ projectTaskId: task.projectId, task: { id: task.$id, assigneeId: task.assigneeId } })} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4' />Adicionar tarefa</Button>
+        <Button onClick={() => openSubTask({ projectTaskId: task.projectId, task: { id: task.$id, assigneeId: task.assigneeId } })} size='sm'><PlusIcon className='size-4' />Adicionar tarefa</Button>
       </div>
       <DottedSeparator className='my-4' />
       <TaskList data={task.subtasks?.documents || []} />

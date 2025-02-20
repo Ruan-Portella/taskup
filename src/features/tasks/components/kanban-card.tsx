@@ -1,11 +1,13 @@
 import React from 'react'
 import { Task } from '../types'
 import { TaskActions } from './task-actions';
-import { MoreHorizontal } from 'lucide-react';
+import { AlertTriangleIcon, MoreHorizontal } from 'lucide-react';
 import { DottedSeparator } from '@/components/dotted-separator';
 import { MemberAvatar } from '@/features/members/components/member-avatar';
 import TaskDate from './task-date';
 import { ProjectAvatar } from '@/features/projects/components/project-avatar';
+import { CircularProgress } from '@/components/circular-progress';
+import { TooltipContent, TooltipProvider, TooltipTrigger, Tooltip } from '@/components/ui/tooltip';
 
 interface KanbanCardProps {
   task: Task;
@@ -41,7 +43,30 @@ export default function KanbanCard({
         <span className='text-xs font-medium'>
           {task.project.name}
         </span>
+        <div className='size-1 rounded-full bg-neutral-300' />
+        <div className='mt-0.5'>
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger className='flex items-center'>
+                <CircularProgress percentage={task.completionPercentage || 0}  />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {task.completionPercentage}% concluído
+                </p>
+                {
+                  task.subtasks && task.subtasks.total > 0 && (
+                    <p className='text-xs flex gap-1'>
+                      <AlertTriangleIcon className='size-4' />
+                      Esta tarefa possui subtarefas pendentes.
+                    </p>
+                  )
+                }
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
       </div>
-    </div>
+    </div >
   );
 };

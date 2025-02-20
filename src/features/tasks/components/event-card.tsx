@@ -6,6 +6,9 @@ import { MemberAvatar } from '@/features/members/components/member-avatar';
 import { ProjectAvatar } from '@/features/projects/components/project-avatar';
 import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import { useRouter } from 'next/navigation';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { CircularProgress } from '@/components/circular-progress';
+import { AlertTriangleIcon } from 'lucide-react';
 
 interface EventCardProps {
   title: string;
@@ -13,6 +16,10 @@ interface EventCardProps {
   project: Project;
   status: TaskStatus;
   id: string;
+  subtasks?: {
+    total: number;
+  },
+  completionPercentage?: number;
 };
 
 const statusColorMap: Record<TaskStatus, string> = {
@@ -23,7 +30,7 @@ const statusColorMap: Record<TaskStatus, string> = {
   [TaskStatus.DONE]: 'border-l-emerald-500',
 };
 
-export default function EventCard({ title, assignee, project, status, id }: EventCardProps) {
+export default function EventCard({ title, assignee, project, status, id, completionPercentage, subtasks }: EventCardProps) {
   const workspaceId = useWorkspacesId();
   const router = useRouter();
 
@@ -46,6 +53,29 @@ export default function EventCard({ title, assignee, project, status, id }: Even
             name={project?.name}
             image={project?.imageUrl}
           />
+          <div className='size-1 rounded-full bg-neutral-300' />
+        <div className='mt-0.5'>
+          <TooltipProvider>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger className='flex items-center'>
+                <CircularProgress percentage={completionPercentage || 0} />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  {completionPercentage}% concluído
+                </p>
+                {
+                  subtasks && subtasks.total > 0 && (
+                    <p className='text-xs flex gap-1'>
+                      <AlertTriangleIcon className='size-4' />
+                      Esta tarefa possui subtarefas pendentes.
+                    </p>
+                  )
+                }
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         </div>
       </div>
     </div>

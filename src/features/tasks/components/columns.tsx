@@ -196,7 +196,7 @@ export const columns: ColumnDef<Task>[] = [
       const status = row.original.status;
       let hasSubTasks = false;
 
-      if (row.original.subtasks && row.original.subtasks.total > 0 && row.original.status === TaskStatus.DONE && row.original.completionPercentage) {
+      if (row.original.subtasks && row.original.subtasks.total > 0 && row.original.status === TaskStatus.DONE && row.original.completionPercentage !== undefined && row.original.completionPercentage !== null) {
         hasSubTasks = row.original.completionPercentage < 100;
       };
 

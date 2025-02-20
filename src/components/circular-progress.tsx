@@ -1,4 +1,4 @@
-export const CircularProgress = ({ percentage }: { percentage: number}) => {
+export const CircularProgress = ({ percentage, textPercentage = true }: { percentage: number, textPercentage?: boolean }) => {
   return (
     <div className="relative w-full h-5 flex items-center gap-1">
       <div
@@ -8,9 +8,13 @@ export const CircularProgress = ({ percentage }: { percentage: number}) => {
                        conic-gradient(#3b82f6 ${percentage * 3.6}deg, #e5e7eb 0deg)`,
         }}
       ></div>
-      <span className="text-lg font-bold text-gray-700">
-        {percentage}%
-      </span>
+      {
+        textPercentage && (
+          <span className="text-lg font-bold text-gray-700">
+            {percentage}%
+          </span>
+        )
+      }
     </div >
   )
 };

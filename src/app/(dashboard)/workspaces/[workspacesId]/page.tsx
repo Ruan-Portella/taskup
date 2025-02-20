@@ -1,10 +1,12 @@
 'use client';
 import Analytics from '@/components/analytics';
+import { CircularProgress } from '@/components/circular-progress';
 import { DottedSeparator } from '@/components/dotted-separator';
 import PageError from '@/components/page-error';
 import PageLoader from '@/components/page-loader';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useGetMembers } from '@/features/members/api/use-get-members';
 import { MemberAvatar } from '@/features/members/components/member-avatar';
 import { Member } from '@/features/members/types/member';
@@ -19,7 +21,7 @@ import { useGetWorkspaceAnalytics } from '@/features/workspaces/api/use-get-work
 import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { CalendarIcon, PlusIcon, SettingsIcon } from 'lucide-react';
+import { AlertTriangleIcon, CalendarIcon, PlusIcon, SettingsIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react'
 
@@ -103,6 +105,29 @@ const TaskList = ({ data, total }: TaskListProps) => {
                             })}
                           </span>
                         </div>
+                        <div className='size-1 rounded-full bg-neutral-300' />
+                        <div className='mt-0.5'>
+                          <TooltipProvider>
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger className='flex items-center'>
+                                <CircularProgress percentage={task.completionPercentage || 0} />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  {task.completionPercentage}% concluído
+                                </p>
+                                {
+                                  task.subtasks && task.subtasks.total > 0 && (
+                                    <p className='text-xs flex gap-1'>
+                                      <AlertTriangleIcon className='size-4' />
+                                      Esta tarefa possui subtarefas pendentes.
+                                    </p>
+                                  )
+                                }
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -151,10 +176,10 @@ const ProjectList = ({ data, total }: ProjectListProps) => {
                         fallBackClassname='text-lg'
                         name={project.name}
                         image={project.imageUrl}
-                        />
-                        <p className='text-lg font-medium truncate'>
-                          {project.name}
-                        </p>
+                      />
+                      <p className='text-lg font-medium truncate'>
+                        {project.name}
+                      </p>
                     </CardContent>
                   </Card>
                 </Link>
@@ -182,7 +207,7 @@ const MembersList = ({ data, total }: MemberListProps) => {
           </p>
           <Button variant='secondary' size='icon' asChild>
             <Link href={`/workspaces/${workspaceId}/members`}>
-            <SettingsIcon className='size-4 text-neutral-400' />
+              <SettingsIcon className='size-4 text-neutral-400' />
             </Link>
           </Button>
         </div>
@@ -191,22 +216,22 @@ const MembersList = ({ data, total }: MemberListProps) => {
           {
             data.map((member) => (
               <li key={member.$id}>
-                  <Card className='shadow-none rounded-lg overflow-hidden'>
-                    <CardContent className='p-3 flex flex-col items-center gap-x-2'>
-                      <MemberAvatar
-                        className='size-12'
-                        name={member.name}
-                        />
-                        <div className='flex flex-col items-center overflow-hidden'>
-                        <p className='text-lg font-medium line-clamp-1'>
-                          {member.name}
-                        </p>
-                        <p className='text-sm text-muted-foreground line-clamp-1'>
-                          {member.email}
-                        </p>
-                        </div>
-                    </CardContent>
-                  </Card>
+                <Card className='shadow-none rounded-lg overflow-hidden'>
+                  <CardContent className='p-3 flex flex-col items-center gap-x-2'>
+                    <MemberAvatar
+                      className='size-12'
+                      name={member.name}
+                    />
+                    <div className='flex flex-col items-center overflow-hidden'>
+                      <p className='text-lg font-medium line-clamp-1'>
+                        {member.name}
+                      </p>
+                      <p className='text-sm text-muted-foreground line-clamp-1'>
+                        {member.email}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
               </li>
             ))
           }

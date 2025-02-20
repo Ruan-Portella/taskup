@@ -71,6 +71,8 @@ export default function DataCalendar({ data }: DataCalendarProps) {
     assignee: task.assignee,
     status: task.status,
     id: task.$id,
+    completionPercentage: task.completionPercentage,
+    subtasks: task.subtasks,
   }));
 
   const handleNavigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
@@ -115,6 +117,8 @@ export default function DataCalendar({ data }: DataCalendarProps) {
             assignee={event.assignee}
             project={event.project}
             status={event.status}
+            completionPercentage={event.completionPercentage}
+            subtasks={event.subtasks}
           />
         ),
         toolbar: () => (
