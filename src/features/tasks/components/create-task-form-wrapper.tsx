@@ -10,9 +10,12 @@ import { TaskStatus } from '../types';
 interface CreateTaskFormWrapperProps {
   onCancel: () => void
   status: TaskStatus | undefined
+  taskId: string | undefined
+  projectId: string | undefined
+  assigneeId: string | undefined
 };
 
-export default function CreateTaskFormWrapper({ onCancel, status }: CreateTaskFormWrapperProps) {
+export default function CreateTaskFormWrapper({ onCancel, status, taskId, projectId, assigneeId }: CreateTaskFormWrapperProps) {
   const workspaceId = useWorkspacesId();
 
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects({ workspaceId });
@@ -42,6 +45,6 @@ export default function CreateTaskFormWrapper({ onCancel, status }: CreateTaskFo
   };
 
   return (
-    <CreateTaskForm onCancel={onCancel} projectOptions={projectOptions ?? []} memberOptions={memberOptions ?? []} status={status} />
+    <CreateTaskForm onCancel={onCancel} projectOptions={projectOptions ?? []} memberOptions={memberOptions ?? []} status={status} taskId={taskId} projectId={projectId} assigneeId={assigneeId} />
   );
 };

@@ -1,14 +1,16 @@
 'use client';
 import { ColumnDef } from '@tanstack/react-table'
-import { Task } from '../types';
+import { Task, TaskStatus } from '../types';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, ArrowUpDown, MoreVertical } from 'lucide-react';
+import { AlertTriangleIcon, ArrowUp, ArrowUpDown, MoreVertical } from 'lucide-react';
 import { ProjectAvatar } from '@/features/projects/components/project-avatar';
 import { MemberAvatar } from '@/features/members/components/member-avatar';
 import TaskDate from './task-date';
 import { Badge } from '@/components/ui/badge';
 import { statusToPTBR } from '@/lib/utils';
 import { TaskActions } from './task-actions';
+import { CircularProgress } from '@/components/circular-progress';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -192,13 +194,79 @@ export const columns: ColumnDef<Task>[] = [
     },
     cell: ({ row }) => {
       const status = row.original.status;
+      let hasSubTasks = false;
+
+      if (row.original.subtasks && row.original.subtasks.total > 0 && row.original.status === TaskStatus.DONE && row.original.completionPercentage) {
+        hasSubTasks = row.original.completionPercentage < 100;
+      };
 
       return (
-        <Badge variant={status}>
-          {statusToPTBR(status)}
-        </Badge>
+        <>
+          {
+            hasSubTasks ? (
+              <Badge variant={status}>
+                <TooltipProvider>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger className='flex items-center'>
+                      <AlertTriangleIcon className='size-4 mr-1 text-black' />
+                      {statusToPTBR(status)}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        Esta tarefa possui subtarefas pendentes.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </Badge>
+            ) : (
+              <Badge variant={status}>
+                {statusToPTBR(status)}
+              </Badge>
+            )
+          }
+        </>
       )
     }
+  },
+  {
+    accessorKey: 'completionPercentage',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className='p-0 hover:bg-transparent'
+          onClick={column.getToggleSortingHandler()}>
+          Progresso
+          {
+            column.getIsSorted() === "asc" && (
+              <ArrowUp className="h-4 w-4" />
+            )
+          }
+          {
+            column.getIsSorted() === "desc" && (
+              <ArrowUp className="h-4 w-4 transform rotate-180" />
+            )
+          }
+          {
+            !column.getIsSorted() && (
+              <ArrowUpDown className="h-4 w-4" />
+            )
+          }
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      let completionPercentage = 0;
+
+      if (row.original.completionPercentage) {
+        completionPercentage = row.original.completionPercentage;
+      };
+
+      return (
+        <CircularProgress percentage={completionPercentage} />
+      )
+    },
   },
   {
     accessorKey: 'actions',

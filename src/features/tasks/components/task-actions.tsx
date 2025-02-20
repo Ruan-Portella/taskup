@@ -10,14 +10,17 @@ interface TaskActionsProps {
   id: string;
   projectId: string;
   children: React.ReactNode;
+  isSubTask?: boolean;
+  parentTaskId?: string;
+  assigneeId?: string;
 };
 
-export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
+export const TaskActions = ({ id, projectId, children, isSubTask, parentTaskId, assigneeId }: TaskActionsProps) => {
   const workspaceId = useWorkspacesId();
   const router = useRouter();
   const pathname = usePathname();
 
-  const { open } = useEditTaskModal();
+  const { open, openSubTask } = useEditTaskModal();
 
   const [ConfirmDialog, confirm] = useConfirm('Deletar Tarefa', 'Essa ação é irreversível.', 'destructive');
   const { mutate, isPending } = useDeleteTask();
@@ -45,13 +48,17 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
           {children}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem onClick={onOpenTask}
-            className="font-medium p-[10px]">
-            <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
-            Detalhes da Tarefa
-          </DropdownMenuItem>
           {
-            pathname.includes('tasks') && (
+            !isSubTask && (
+              <DropdownMenuItem onClick={onOpenTask}
+                className="font-medium p-[10px]">
+                <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
+                Detalhes da Tarefa
+              </DropdownMenuItem>
+            )
+          }
+          {
+            pathname.includes('tasks') && !isSubTask && (
               <DropdownMenuItem onClick={onOpenProject}
                 className="font-medium p-[10px]">
                 <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
@@ -59,7 +66,13 @@ export const TaskActions = ({ id, projectId, children }: TaskActionsProps) => {
               </DropdownMenuItem>
             )
           }
-          <DropdownMenuItem onClick={() => open(id)}
+          <DropdownMenuItem onClick={() => {
+            if (isSubTask && parentTaskId && assigneeId) {
+              openSubTask({ projectTaskId: projectId, task: { id, assigneeId, parentTaskId } });
+            } else {
+              open(id);
+            }
+          }}
             className="font-medium p-[10px]">
             <PencilIcon className="size-4 mr-2 stroke-2" />
             Editar Tarefa

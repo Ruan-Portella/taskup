@@ -57,8 +57,6 @@ export function DataTable<TData, TValue>({
     },
   })
 
-  console.log(sorting)
-
   return (
     <div>
       <div className="rounded-md border">

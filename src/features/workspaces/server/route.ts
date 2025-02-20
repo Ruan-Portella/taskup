@@ -134,7 +134,8 @@ const app = new Hono()
           [
             Query.equal('workspaceId', workspaceId),
             Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
-            Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString())
+            Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
+            Query.isNull('parentTaskId')
           ]
         )
   
@@ -144,7 +145,8 @@ const app = new Hono()
           [
             Query.equal('workspaceId', workspaceId),
             Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
-            Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString())
+            Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
+            Query.isNull('parentTaskId')
           ]
         )
   

@@ -17,8 +17,6 @@ export async function GET(request: NextRequest) {
   const session = await account.createSession(userId, secret);
   const cookiesA = await cookies();
 
-  console.log("Setting cookie", session.secret);
-
   cookiesA.set(AUTH_COOKIE, session.secret, {
     path: "/",
     httpOnly: true,

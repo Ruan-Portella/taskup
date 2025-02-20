@@ -19,9 +19,12 @@ export const useUpdateTask = () => {
 
       return await response.json();
     },
-    onSuccess: ({data, projectId, workspaceId}) => {
+    onSuccess: ({data, projectId, workspaceId, parentTaskId}) => {
       toast.success('Tarefa atualizada com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      if (parentTaskId) {
+        queryClient.invalidateQueries({ queryKey: ['task', parentTaskId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['task', data.$id] });
       queryClient.invalidateQueries({ queryKey: ['project-analytics', projectId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-analytics', workspaceId] });

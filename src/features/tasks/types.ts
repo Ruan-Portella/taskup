@@ -17,4 +17,10 @@ export type Task = Models.Document & {
   dueDate: string;
   workspaceId: string;
   description?: string;
+  subtasks?: {
+    total: number;
+    documents: Task[];
+  };
+  parentTaskId?: string;
+  completionPercentage?: number;
 }

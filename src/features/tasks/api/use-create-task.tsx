@@ -19,9 +19,12 @@ export const useCreateTask = () => {
 
       return await response.json();
     },
-    onSuccess: ({projectId, workspaceId}) => {
+    onSuccess: ({parentTaskId, projectId, workspaceId}) => {
       toast.success('Tarefa criada com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      if (parentTaskId) {
+        queryClient.invalidateQueries({ queryKey: ['task', parentTaskId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['project-analytics', projectId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-analytics', workspaceId] });
     },

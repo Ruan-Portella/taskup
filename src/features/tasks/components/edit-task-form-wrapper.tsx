@@ -10,9 +10,12 @@ import { EditTaskForm } from './edit-task-form';
 interface EditTaskFormWrapperProps {
   onCancel: () => void;
   id: string;
+  projectId?: string;
+  assigneeId?: string;
+  parentTaskId?: string;
 };
 
-export default function EditTaskFormWrapper({ onCancel, id }: EditTaskFormWrapperProps) {
+export default function EditTaskFormWrapper({ onCancel, id, projectId, assigneeId, parentTaskId }: EditTaskFormWrapperProps) {
   const workspaceId = useWorkspacesId();
 
   const {data: initialValues, isLoading: isLoadingTask} = useGetTask({taskId: id});
@@ -47,6 +50,9 @@ export default function EditTaskFormWrapper({ onCancel, id }: EditTaskFormWrappe
   }
 
   return (
-    <EditTaskForm onCancel={onCancel} projectOptions={projectOptions ?? []} memberOptions={memberOptions ?? []} initialValues={initialValues} />
+    <EditTaskForm onCancel={onCancel} projectOptions={projectOptions ?? []} memberOptions={memberOptions ?? []} initialValues={{
+      ...initialValues,
+      subtasks: undefined
+    }} projectId={projectId} assigneeId={assigneeId} parentTaskId={parentTaskId} />
   );
 };

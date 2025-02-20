@@ -95,7 +95,8 @@ const app = new Hono()
         [
           Query.equal('projectId', projectId),
           Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
-          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString())
+          Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
+          Query.isNull('parentTaskId')
         ]
       )
 
@@ -105,123 +106,32 @@ const app = new Hono()
         [
           Query.equal('projectId', projectId),
           Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
-          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString())
+          Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
+          Query.isNull('parentTaskId')
         ]
       )
 
       const taskDifference = thisMonthTask.total - lastMonthTask.total;
 
-      console.log(thisMonthTask.documents[0])
-      console.log(member.$id)
       const thisMonthAssignedTask = thisMonthTask.documents.filter(task => task.assigneeId === member.$id).length;
-
-      // const thisMonthAssignedTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.equal('assigneeId', member.$id),
-      //     Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
-      //   ]
-      // )
-
-      // const lastMonthAssignedTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.equal('assigneeId', member.$id),
-      //     Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
-      //   ]
-      // )
 
       const lastMonthAssignedTask = lastMonthTask.documents.filter(task => task.assigneeId === member.$id).length;
 
       const assignedTaskDifference = thisMonthAssignedTask - lastMonthAssignedTask;
       
-      // const thisMonthIncompleteTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.notEqual('status', TaskStatus.DONE),
-      //     Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
-      //   ]
-      // )
-
       const thisMonthIncompleteTask = thisMonthTask.documents.filter(task => task.status !== TaskStatus.DONE).length;
-
-      // const lastMonthIncompleteTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.notEqual('status', TaskStatus.DONE),
-      //     Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
-      //   ]
-      // )
 
       const lastMonthIncompleteTask = lastMonthTask.documents.filter(task => task.status !== TaskStatus.DONE).length;
 
       const incompleteTaskDifference = thisMonthIncompleteTask - lastMonthIncompleteTask;
 
-      // const thisMonthCompleteTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.equal('status', TaskStatus.DONE),
-      //     Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
-      //   ]
-      // )
-
       const thisMonthCompleteTask = thisMonthTask.documents.filter(task => task.status === TaskStatus.DONE).length;
-
-      // const lastMonthCompleteTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.equal('status', TaskStatus.DONE),
-      //     Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
-      //   ]
-      // )
 
       const lastMonthCompleteTask = lastMonthTask.documents.filter(task => task.status === TaskStatus.DONE).length;
 
       const completeTaskDifference = thisMonthCompleteTask - lastMonthCompleteTask;
 
-      // const thisMonthOverdueTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.notEqual('status', TaskStatus.DONE),
-      //     Query.lessThan('dueDate', now.toISOString()),
-      //     Query.greaterThanEqual('$createdAt', thisMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', thisMonthEnd.toISOString()),
-      //   ]
-      // )
-
       const thisMonthOverdueTask = thisMonthTask.documents.filter(task => task.status !== TaskStatus.DONE && new Date(task.dueDate) < now).length;
-
-      // const lastMonthOverdueTask = await databases.listDocuments(
-      //   DATABASE_ID,
-      //   TASKS_ID,
-      //   [
-      //     Query.equal('projectId', projectId),
-      //     Query.notEqual('status', TaskStatus.DONE),
-      //     Query.lessThan('dueDate', now.toISOString()),
-      //     Query.greaterThanEqual('$createdAt', lastMonthStart.toISOString()),
-      //     Query.lessThanEqual('$createdAt', lastMonthEnd.toISOString()),
-      //   ]
-      // )
 
       const lastMonthOverdueTask = lastMonthTask.documents.filter(task => task.status !== TaskStatus.DONE && new Date(task.dueDate) < now).length;
 

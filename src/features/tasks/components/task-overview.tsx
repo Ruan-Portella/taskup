@@ -9,6 +9,7 @@ import TaskDate from './task-date'
 import { Badge } from '@/components/ui/badge'
 import { statusToPTBR } from '@/lib/utils'
 import { useEditTaskModal } from '../hooks/use-edit-task-modal'
+import { Progress } from '@/components/ui/progress'
 
 interface TaskOverviewProps {
   task: Task
@@ -17,7 +18,8 @@ interface TaskOverviewProps {
 export default function TaskOverview({
   task
 }: TaskOverviewProps) {
-  const {open} = useEditTaskModal()
+  const { open } = useEditTaskModal()
+  const completionPercentage = task.completionPercentage;
 
   return (
     <div className='flex flex-col gap-y-4 col-span-1'>
@@ -45,6 +47,12 @@ export default function TaskOverview({
             <Badge variant={task.status}>
               {statusToPTBR(task.status)}
             </Badge>
+          </OverviewProperty>
+          <OverviewProperty label='Progresso'>
+            <div className='flex items-center gap-x-2'>
+              <span>{completionPercentage}%</span>
+              <Progress className='w-[100px]' value={completionPercentage} />
+            </div>
           </OverviewProperty>
         </div>
       </div>

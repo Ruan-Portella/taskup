@@ -23,6 +23,9 @@ export const useDeleteTask = () => {
       toast.success('Tarefa deletada com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['tasks'] });
       queryClient.invalidateQueries({ queryKey: ['task', data.taskId] });
+      if (data.parentTaskId) {
+        queryClient.invalidateQueries({ queryKey: ['task', data.parentTaskId] });
+      }
       queryClient.invalidateQueries({ queryKey: ['project-analytics', data.projectId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-analytics', data.workspaceId] });
     },

@@ -22,10 +22,13 @@ interface CreateTaskFormProps {
   onCancel?: () => void;
   projectOptions: { id: string, name: string, imageUrl: string }[];
   memberOptions: { id: string, name: string }[];
-  status: TaskStatus | undefined
+  status: TaskStatus | undefined;
+  taskId: string | undefined;
+  projectId: string | undefined;
+  assigneeId: string | undefined;
 };
 
-export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status }: CreateTaskFormProps) => {
+export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status, taskId, projectId, assigneeId }: CreateTaskFormProps) => {
   const workspaceId = useWorkspacesId();
   const { mutate, isPending } = useCreateTask();
 
@@ -33,12 +36,14 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
     resolver: zodResolver(createTaskSchema.omit({ workspaceId: true })),
     defaultValues: {
       workspaceId,
-      status: status
+      status,
+      projectId,
+      assigneeId
     }
   })
 
   const onSubmit = (values: z.infer<typeof createTaskSchema>) => {
-    mutate({ json: { ...values, workspaceId } }, {
+    mutate({ json: { ...values, workspaceId, parentTaskId: taskId } }, {
       onSuccess: () => {
         form.reset();
         onCancel?.();
@@ -50,7 +55,9 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">
-          Criar nova tarefa
+          Criar {
+            taskId ? 'Subtarefa' : 'Tarefa'
+          }
         </CardTitle>
       </CardHeader>
       <div className="px-7">
@@ -95,39 +102,43 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="assigneeId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="assigneeId">
-                      Responsável
-                    </FormLabel>
-                    <Select defaultValue={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um responsável" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <FormMessage />
-                      <SelectContent>
-                        {memberOptions.map(member => (
-                          <SelectItem key={member.id} value={member.id}>
-                            <div className="flex items-center gap-x-2">
-                              <MemberAvatar
-                                name={member.name}
-                                className="size-6"
-                              />
-                              <span>{member.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {
+                !assigneeId && (
+                  <FormField
+                    control={form.control}
+                    name="assigneeId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="assigneeId">
+                          Responsável
+                        </FormLabel>
+                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione um responsável" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <FormMessage />
+                          <SelectContent>
+                            {memberOptions.map(member => (
+                              <SelectItem key={member.id} value={member.id}>
+                                <div className="flex items-center gap-x-2">
+                                  <MemberAvatar
+                                    name={member.name}
+                                    className="size-6"
+                                  />
+                                  <span>{member.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )
+              }
               <FormField
                 control={form.control}
                 name="status"
@@ -165,40 +176,44 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="projectId"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="projectId">
-                      Projeto
-                    </FormLabel>
-                    <Select defaultValue={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um projeto" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <FormMessage />
-                      <SelectContent>
-                        {projectOptions.map(project => (
-                          <SelectItem key={project.id} value={project.id}>
-                            <div className="flex items-center gap-x-2">
-                              <ProjectAvatar
-                                name={project.name}
-                                className="size-6"
-                                image={project.imageUrl}
-                              />
-                              <span>{project.name}</span>
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {
+                !projectId && (
+                  <FormField
+                    control={form.control}
+                    name="projectId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="projectId">
+                          Projeto
+                        </FormLabel>
+                        <Select defaultValue={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione um projeto" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <FormMessage />
+                          <SelectContent>
+                            {projectOptions.map(project => (
+                              <SelectItem key={project.id} value={project.id}>
+                                <div className="flex items-center gap-x-2">
+                                  <ProjectAvatar
+                                    name={project.name}
+                                    className="size-6"
+                                    image={project.imageUrl}
+                                  />
+                                  <span>{project.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )
+              }
             </div>
             <DottedSeparator className="py-9" />
             <div className="flex items-center justify-between">

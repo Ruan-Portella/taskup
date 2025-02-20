@@ -64,7 +64,7 @@ export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcher
               Calendário
             </TabsTrigger>
           </TabsList>
-          <Button onClick={() => open()} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4 mr-2' />Adicionar tarefa</Button>
+          <Button onClick={() => open()} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4' />Adicionar tarefa</Button>
         </div>
         <DottedSeparator className='my-4' />
         <DataFilters hideProjectFilter={hideProjectFilter} />

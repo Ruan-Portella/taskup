@@ -28,7 +28,7 @@ export default function TaskDescription({ task }: TaskDescriptionProps) {
     <div className='p-4 border rounded-lg'>
       <div className='flex items-center justify-between'>
         <p className='text-lg font-semibold' >
-          Visão Geral
+          Descrição
         </p>
         <Button onClick={() => setIsEditing(!isEditing)} size='sm' variant='secondary'>
           {
