@@ -7,6 +7,7 @@ export const createTaskSchema = z.object({
   workspaceId: z.string().trim().min(1, 'Campo obrigatório'),
   projectId: z.string({required_error: 'Campo obrigatório'}),
   dueDate: z.coerce.date(),
+  categoryId: z.string().optional(),
   assigneeId: z.string({required_error: 'Campo obrigatório', message: 'Campo obrigatório'}),
   description: z.string().optional(),
   parentTaskId: z.string().optional(),
