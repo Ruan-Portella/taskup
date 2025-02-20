@@ -24,9 +24,13 @@ export function useEditTaskModal() {
     taskId,
     projectId,
     open,
-    openSubTask: ({projectTaskId, task}: {projectTaskId: string, task: ReturnType<typeof querySchema.parse> }) => {
-      setTaskId(task.id)
-      setProjectId(projectTaskId)
+    openSubTask: ({projectTaskId, task}: {projectTaskId?: string, task: ReturnType<typeof querySchema.parse> }) => {
+      if (task.id) {
+        setTaskId(task.id)
+      }
+      if (projectTaskId) {
+        setProjectId(projectTaskId)
+      }
       setTask(task)
     },
     close,

@@ -14,13 +14,13 @@ const app = new Hono()
   .get(
     '/',
     sessionMiddleware,
-    zValidator('query', z.object({ workspaceId: z.string(), projectId: z.string().nullish(), assigneeId: z.string().nullish(), status: z.nativeEnum(TaskStatus).nullish(), search: z.string().nullish(), dueDate: z.string().nullish() })),
+    zValidator('query', z.object({ workspaceId: z.string(), projectId: z.string().nullish(), assigneeId: z.string().nullish(), status: z.nativeEnum(TaskStatus).nullish(), search: z.string().nullish(), dueDate: z.string().nullish(), hideAssigneeFilter: z.string().nullish() })),
     async (c) => {
       const { users } = await createAdminClient();
       const databases = c.get('databases');
       const user = c.get('user');
 
-      const { workspaceId, projectId, assigneeId, status, search, dueDate } = c.req.valid('query');
+      const { workspaceId, projectId, assigneeId, status, search, dueDate, hideAssigneeFilter } = c.req.valid('query');
 
       const member = await getMember({
         databases,
@@ -45,12 +45,17 @@ const app = new Hono()
         query.push(Query.equal('status', status));
       }
 
+      if (hideAssigneeFilter === 'true') {
+        query.push(Query.equal('assigneeId', member.$id));
+      }
+
       if (assigneeId) {
         query.push(Query.equal('assigneeId', assigneeId));
       }
 
       if (dueDate) {
-        query.push(Query.equal('dueDate', dueDate));
+        query.push(Query.greaterThanEqual('dueDate', dueDate));
+        query.push(Query.lessThanEqual('dueDate', dueDate));
       }
 
       if (search) {
@@ -138,7 +143,6 @@ const app = new Hono()
       );
 
       const newPosition = highestPositionTask.documents.length > 0 ? highestPositionTask.documents[0].position + 1000 : 1000;
-
       const task = await databases.createDocument(
         DATABASE_ID,
         TASKS_ID,

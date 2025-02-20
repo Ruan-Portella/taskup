@@ -10,9 +10,10 @@ import DatePicker from '@/components/date-picker';
 
 interface DataFiltersProps {
   hideProjectFilter?: boolean;
+  hideAssigneeFilter?: boolean;
 };
 
-export default function DataFilters({ hideProjectFilter }: DataFiltersProps) {
+export default function DataFilters({ hideProjectFilter, hideAssigneeFilter }: DataFiltersProps) {
   const workspaceId = useWorkspacesId();
 
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects({ workspaceId });
@@ -26,8 +27,8 @@ export default function DataFilters({ hideProjectFilter }: DataFiltersProps) {
   }));
 
   const memberOptions = members?.documents.map(member => ({
-    value: member.$id,
-    label: member.name,
+    value: member?.$id,
+    label: member?.name,
   }));
 
   const [{
@@ -74,23 +75,27 @@ export default function DataFilters({ hideProjectFilter }: DataFiltersProps) {
           </Select>
         )
       }
-      <Select defaultValue={assigneeId ?? undefined} onValueChange={(value) => onAssigneeChange(value)}>
-        <SelectTrigger className='w-full lg:w-auto h-8'>
-          <div className='flex items-center gap-2'>
-            <UserIcon className='size-4' />
-            <SelectValue placeholder='Todos Responsáveis' />
-          </div>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value='all'>Todos Responsáveis</SelectItem>
-          <SelectSeparator />
-          {memberOptions?.map(member => (
-            <SelectItem key={member.value} value={member.value}>
-              {member.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {
+        !hideAssigneeFilter && (
+          <Select defaultValue={assigneeId ?? undefined} onValueChange={(value) => onAssigneeChange(value)}>
+            <SelectTrigger className='w-full lg:w-auto h-8'>
+              <div className='flex items-center gap-2'>
+                <UserIcon className='size-4' />
+                <SelectValue placeholder='Todos Responsáveis' />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value='all'>Todos Responsáveis</SelectItem>
+              <SelectSeparator />
+              {memberOptions?.map(member => (
+                <SelectItem key={member.value} value={member.value ?? ''}>
+                  {member.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )
+      }
       <DatePicker className='h-8 lg:w-fit' placeholder='Data de Entrega' value={dueDate ? new Date(dueDate) : undefined} onChange={(value) => setFilters({ dueDate: value ? value.toISOString() : null })} />
       <Select defaultValue={status ?? undefined} onValueChange={(value) => onStatusChange(value)}>
         <SelectTrigger className='w-full lg:w-auto h-8'>

@@ -30,7 +30,12 @@ export default function CreateTaskFormWrapper({ onCancel, status, taskId, projec
   const memberOptions = members?.documents.map(member => ({
     id: member.$id,
     name: member.name,
+    userId: member.userId
   }));
+
+  if (assigneeId?.includes('-taskup')) {
+    assigneeId = memberOptions?.find(member => member.userId === assigneeId?.replace('-taskup', ''))?.id;
+  }
 
   const isLoading = isLoadingMembers || isLoadingProjects;
 

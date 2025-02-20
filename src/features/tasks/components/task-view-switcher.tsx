@@ -18,12 +18,14 @@ import { TaskStatus } from '../types';
 import { useBulkUpdateTasks } from '../api/use-bulk-update-tasks';
 import DataCalendar from './data-calendar';
 import { useProjectId } from '@/features/projects/hooks/use-project-id';
+import { useMe } from '@/features/auth/api/use-me';
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
+  hideAssigneeFilter?: boolean;
 };
 
-export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcherProps) {
+export default function TaskViewSwitcher({ hideProjectFilter, hideAssigneeFilter }: TaskViewSwitcherProps) {
   const [{
     status,
     assigneeId,
@@ -37,18 +39,21 @@ export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcher
 
   const defaultProjectId = useProjectId();
 
+  const me = useMe();
+
   const workspaceId = useWorkspacesId();
-  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId, projectId: projectId || defaultProjectId, dueDate });
-  const { open } = useCreateTaskModal();
 
-  const {mutate: bulkUpdateTasks} = useBulkUpdateTasks();
+  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId: assigneeId, projectId: projectId || defaultProjectId, dueDate, hideAssigneeFilter });
+  const { openProjectId, open, openSubTask } = useCreateTaskModal();
 
-  const onKanbanChange = useCallback((tasks: {$id: string, status: TaskStatus, position: number}[]) => {
+  const { mutate: bulkUpdateTasks } = useBulkUpdateTasks();
+
+  const onKanbanChange = useCallback((tasks: { $id: string, status: TaskStatus, position: number }[]) => {
     bulkUpdateTasks({
-      json: {tasks}
+      json: { tasks }
     });
   }, [bulkUpdateTasks])
-
+ 
   return (
     <Tabs defaultValue={view} onValueChange={setView} className='flex-1 w-full border rounded-lg'>
       <div className='h-full flex flex-col overflow-auto p-4'>
@@ -64,10 +69,18 @@ export default function TaskViewSwitcher({ hideProjectFilter }: TaskViewSwitcher
               Calendário
             </TabsTrigger>
           </TabsList>
-          <Button onClick={() => open()} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4' />Adicionar tarefa</Button>
+          <Button onClick={() => {
+            if (hideProjectFilter) {
+              openProjectId(projectId || defaultProjectId)
+            } else if (hideAssigneeFilter) {
+              openSubTask({task: {assigneeId: `${me?.data?.$id}-taskup`}})
+            }  else {
+              open()
+            }
+          }} size='sm' className='w-full lg:w-auto'><PlusIcon className='size-4' />Adicionar tarefa</Button>
         </div>
         <DottedSeparator className='my-4' />
-        <DataFilters hideProjectFilter={hideProjectFilter} />
+        <DataFilters hideProjectFilter={hideProjectFilter} hideAssigneeFilter={hideAssigneeFilter} />
         <DottedSeparator className='my-4' />
         {
           isLoadingTasks ? (

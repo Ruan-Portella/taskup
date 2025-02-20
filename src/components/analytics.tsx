@@ -13,7 +13,7 @@ export default function Analytics({ data }: ProjectAnalyticsResponseType) {
           <DottedSeparator direction='vertical' />
         </div>
         <div className='flex items-center flex-1'>
-          <AnalyticsCard title='Responsáveis' value={data.assignedTaskCount} variant={data.assignedTaskDifference > 0 ? 'up' : 'down'} increaseValue={data.assignedTaskDifference} />
+          <AnalyticsCard title='Tarefas Atribuídas (eu)' value={data.assignedTaskCount} variant={data.assignedTaskDifference > 0 ? 'up' : 'down'} increaseValue={data.assignedTaskDifference} />
           <DottedSeparator direction='vertical' />
         </div>
         <div className='flex items-center flex-1'>

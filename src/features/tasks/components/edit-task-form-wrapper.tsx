@@ -33,6 +33,13 @@ export default function EditTaskFormWrapper({ onCancel, id, projectId, assigneeI
     name: member.name,
   }));
 
+  let disableAssignee = false;
+
+  if (assigneeId?.includes('-taskup')) {
+    disableAssignee = true;
+    assigneeId = undefined;
+  }
+
   const isLoading = isLoadingMembers || isLoadingProjects || isLoadingTask;
 
   if (isLoading) {
@@ -53,6 +60,6 @@ export default function EditTaskFormWrapper({ onCancel, id, projectId, assigneeI
     <EditTaskForm onCancel={onCancel} projectOptions={projectOptions ?? []} memberOptions={memberOptions ?? []} initialValues={{
       ...initialValues,
       subtasks: undefined
-    }} projectId={projectId} assigneeId={assigneeId} parentTaskId={parentTaskId} />
+    }} projectId={projectId} assigneeId={assigneeId} parentTaskId={parentTaskId} disableAssignee={disableAssignee} />
   );
 };

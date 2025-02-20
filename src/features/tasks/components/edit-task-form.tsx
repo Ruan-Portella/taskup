@@ -25,9 +25,10 @@ interface EditTaskFormProps {
   projectId?: string;
   assigneeId?: string;
   parentTaskId?: string;
+  disableAssignee?: boolean;
 };
 
-export const EditTaskForm = ({ onCancel, projectOptions, memberOptions, initialValues, projectId, assigneeId, parentTaskId }: EditTaskFormProps) => {
+export const EditTaskForm = ({ onCancel, projectOptions, memberOptions, initialValues, projectId, assigneeId, parentTaskId, disableAssignee }: EditTaskFormProps) => {
   const { mutate, isPending } = useUpdateTask();
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
@@ -100,7 +101,7 @@ export const EditTaskForm = ({ onCancel, projectOptions, memberOptions, initialV
                 )}
               />
               {
-                !assigneeId && (
+                (!assigneeId && !disableAssignee) && (
                   <FormField
                     control={form.control}
                     name="assigneeId"

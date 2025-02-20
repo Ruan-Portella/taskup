@@ -28,9 +28,15 @@ export function useCreateTaskModal() {
         setProjectId(null)
       }
     },
-    openSubTask: ({projectTaskId, task}: {projectTaskId: string, task: ReturnType<typeof querySchema.parse> }) => {
+    openProjectId: (projectId: string) => {
       setIsOpen(true)
-      setProjectId(projectTaskId)
+      setProjectId(projectId)
+    },
+    openSubTask: ({projectTaskId, task}: {projectTaskId?: string, task: ReturnType<typeof querySchema.parse> }) => {
+      setIsOpen(true)
+      if (projectTaskId) {
+        setProjectId(projectTaskId)
+      }
       setTask(task)
     },
     close: () => {

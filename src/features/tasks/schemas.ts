@@ -13,7 +13,7 @@ export const createTaskSchema = z.object({
 })
 
 export const querySchema = z.object({
-  id: z.string(),
-  assigneeId: z.string(),
+  id: z.string().optional(),
+  assigneeId: z.string().optional(),
   parentTaskId: z.string().optional(),
 })

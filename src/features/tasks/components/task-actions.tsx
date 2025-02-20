@@ -69,6 +69,8 @@ export const TaskActions = ({ id, projectId, children, isSubTask, parentTaskId, 
           <DropdownMenuItem onClick={() => {
             if (isSubTask && parentTaskId && assigneeId) {
               openSubTask({ projectTaskId: projectId, task: { id, assigneeId, parentTaskId } });
+            } else if (pathname.includes('tasks') ) {
+              openSubTask({task: { id, assigneeId: '-taskup' }});
             } else {
               open(id);
             }
