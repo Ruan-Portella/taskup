@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import QueryProvider from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { ConfettiProvider } from "@/providers/confetti-provider";
 
 const outfit = Outfit({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({
         className={cn(outfit.className, 'antialiased min-h-screen')}
       >
         <NuqsAdapter>
+          <ConfettiProvider />
           <Toaster />
           <QueryProvider>
             {children}

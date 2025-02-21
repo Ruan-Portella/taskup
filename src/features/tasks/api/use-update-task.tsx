@@ -2,12 +2,14 @@ import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InferRequestType, InferResponseType } from "hono";
 import {client} from '@/lib/rpc';
+import { useConfettiStore } from "@/hooks/use-confetti-store";
 
 type ResponseType = InferResponseType<typeof client.api.tasks[':taskId']['$patch'], 200>;
 type RequestType = InferRequestType<typeof client.api.tasks[':taskId']['$patch']>;
 
 export const useUpdateTask = () => {
   const queryClient = useQueryClient();
+  const {onOpen} = useConfettiStore();
 
   const mutation = useMutation<ResponseType, unknown, RequestType>({
     mutationFn: async ({json, param}) => {
@@ -28,6 +30,14 @@ export const useUpdateTask = () => {
       queryClient.invalidateQueries({ queryKey: ['task', data.$id] });
       queryClient.invalidateQueries({ queryKey: ['project-analytics', projectId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-analytics', workspaceId] });
+
+      if (data.completionPercentage === 100 && !data.parentTaskId) {
+        onOpen();
+      }
+
+      if (data.parentTaskId && data.completionPercentageParent === 100) {
+        onOpen();
+      }
     },
     onError: () => {
       toast.error('Erro ao atualizar a tarefa');
