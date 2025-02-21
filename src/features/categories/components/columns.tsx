@@ -40,6 +40,40 @@ export const columns: ColumnDef<Category>[] = [
     }
   },
   {
+    accessorKey: 'color',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className='p-0 hover:bg-transparent'
+          onClick={column.getToggleSortingHandler()}
+        >
+          Cor
+          {
+            column.getIsSorted() === "asc" && (
+              <ArrowUp className="h-4 w-4" />
+            )
+          }
+          {
+            column.getIsSorted() === "desc" && (
+              <ArrowUp className="h-4 w-4 transform rotate-180" />
+            )
+          }
+          {
+            !column.getIsSorted() && (
+              <ArrowUpDown className="h-4 w-4" />
+            )
+          }
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const color = row.original.color;
+      if (!color) return <div>Sem cor</div>
+      return <div className='h-5 w-5 rounded-md' style={{ backgroundColor: color }}></div>
+    }
+  },
+  {
     accessorKey: 'actions',
     header: () => {
       return (

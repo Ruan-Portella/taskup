@@ -12,6 +12,7 @@ import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ColorPicker } from "@/components/color-picker";
 
 interface EditCategoriesFormProps {
   onCancel?: () => void;
@@ -25,6 +26,7 @@ export const EditCategoriesForm = ({ category, onCancel }: EditCategoriesFormPro
     resolver: zodResolver(createCategorySchema.omit({ workspaceId: true })),
     defaultValues: {
       name: category.name,
+      color: category.color,
     }
   })
 
@@ -65,6 +67,26 @@ export const EditCategoriesForm = ({ category, onCancel }: EditCategoriesFormPro
                         id="name"
                         autoComplete='name'
                         placeholder="Nome da Categoria"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="color">
+                      Cor
+                    </FormLabel>
+                    <FormControl>
+                      <ColorPicker
+                        {...field}
+                        id="color"
+                        name="color"
+                        className="w-full h-12"
                       />
                     </FormControl>
                     <FormMessage />

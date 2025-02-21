@@ -75,6 +75,7 @@ const app = new Hono()
       const {
         name,
         workspaceId,
+        color,
       } = c.req.valid('json');
 
       const member = await getMember({
@@ -94,6 +95,7 @@ const app = new Hono()
         {
           name,
           workspaceId,
+          color
         }
       );
 
@@ -114,6 +116,7 @@ const app = new Hono()
 
       const {
         name,
+        color,
       } = c.req.valid('json');
 
       const member = await getMember({
@@ -132,6 +135,7 @@ const app = new Hono()
         categoryId,
         {
           name,
+          color
         }
       );
 

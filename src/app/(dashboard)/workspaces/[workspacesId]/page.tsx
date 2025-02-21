@@ -21,7 +21,7 @@ import { useGetWorkspaceAnalytics } from '@/features/workspaces/api/use-get-work
 import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { AlertTriangleIcon, CalendarIcon, PlusIcon, SettingsIcon } from 'lucide-react';
+import { CalendarIcon, LaptopMinimalCheckIcon, PlusIcon, SettingsIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react'
 
@@ -107,27 +107,28 @@ const TaskList = ({ data, total }: TaskListProps) => {
                         </div>
                         <div className='size-1 rounded-full bg-neutral-300' />
                         <div className='mt-0.5'>
-                          <TooltipProvider>
-                            <Tooltip delayDuration={0}>
-                              <TooltipTrigger className='flex items-center'>
-                                <CircularProgress percentage={task.completionPercentage || 0} />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>
-                                  {task.completionPercentage}% concluído
-                                </p>
-                                {
-                                  task.subtasks && task.subtasks.total > 0 && (
-                                    <p className='text-xs flex gap-1'>
-                                      <AlertTriangleIcon className='size-4' />
-                                      Esta tarefa possui subtarefas pendentes.
-                                    </p>
-                                  )
-                                }
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
+                          <CircularProgress percentage={task.completionPercentage || 0} />
                         </div>
+                        {
+                          task.subtasks && task.subtasks.total > 0 && (
+                            <>
+                              <div className='size-1 rounded-full bg-neutral-300' />
+                              <TooltipProvider>
+                                <Tooltip delayDuration={0}>
+                                  <TooltipTrigger className='flex items-center'>
+                                    <div className='text-xs flex gap-1'>
+                                      <LaptopMinimalCheckIcon className='size-5 mr-1 text-black' />
+
+                                    </div>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Esta tarefa possui subtarefas.</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </>
+                          )
+                        }
                       </div>
                     </CardContent>
                   </Card>

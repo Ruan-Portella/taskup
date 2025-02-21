@@ -12,19 +12,21 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useWorkspacesId } from "@/features/workspaces/hooks/use-workspaces-id";
 import { useCreateCategory } from "../api/use-create-category";
+import { ColorPicker } from "@/components/color-picker";
 
 interface CreateCategoriesFormProps {
   onCancel?: () => void;
 };
 
-export const CreateCategoriesForm = ({onCancel }: CreateCategoriesFormProps) => {
+export const CreateCategoriesForm = ({ onCancel }: CreateCategoriesFormProps) => {
   const workspaceId = useWorkspacesId();
   const { mutate, isPending } = useCreateCategory();
 
   const form = useForm<z.infer<typeof createCategorySchema>>({
     resolver: zodResolver(createCategorySchema.omit({ workspaceId: true })),
     defaultValues: {
-      name: ''
+      name: '',
+      color: '#000000',
     }
   })
 
@@ -65,6 +67,26 @@ export const CreateCategoriesForm = ({onCancel }: CreateCategoriesFormProps) => 
                         id="name"
                         autoComplete='name'
                         placeholder="Nome da Categoria"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="color"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="color">
+                      Cor
+                    </FormLabel>
+                    <FormControl>
+                      <ColorPicker
+                        {...field}
+                        id="color"
+                        name="color"
+                        className="w-full h-12"
                       />
                     </FormControl>
                     <FormMessage />

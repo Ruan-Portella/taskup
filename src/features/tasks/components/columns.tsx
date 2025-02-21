@@ -196,7 +196,7 @@ export const columns: ColumnDef<Task>[] = [
     cell: ({ row }) => {
       return (
         <span>
-          <CategoryColumn category={row.original?.category?.name ?? ''} />
+          <CategoryColumn category={row.original?.category ?? {name: '', color: ''}} />
         </span>
       )
     },
@@ -256,7 +256,7 @@ export const columns: ColumnDef<Task>[] = [
                 </TooltipProvider>
               </Badge>
             ) : (
-              <Badge variant={status}>
+              <Badge variant={status} className='truncate'>
                 {statusToPTBR(status)}
               </Badge>
             )

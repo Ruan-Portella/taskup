@@ -8,8 +8,6 @@ import CreateCategoryFormWrapper from './create-categories-form-wrapper';
 export default function CreateCategoriesModal() {
   const { isOpen, close } = useCreateCategoryModal()
 
-  console.log('isOpen', isOpen)
-
   return (
     <ResponsiveModal open={!!isOpen} onOpenChange={close}>
       {

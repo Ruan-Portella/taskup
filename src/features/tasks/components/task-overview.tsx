@@ -50,7 +50,7 @@ export default function TaskOverview({
             </Badge>
           </OverviewProperty>
           <OverviewProperty label='Status'>
-            <CategoryColumn category={task.category.name} />
+            <CategoryColumn category={task.category} />
           </OverviewProperty>
           <OverviewProperty label='Progresso'>
             <div className='flex items-center gap-x-2'>
