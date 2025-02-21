@@ -185,6 +185,11 @@ const app = new Hono()
         )
 
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`
+
+        await storage.deleteFile(
+          BUCKET_ID,
+          file.$id
+        )
       } else {
         uploadedImageUrl = image;
       }
@@ -196,7 +201,7 @@ const app = new Hono()
         {
           name,
           imageUrl: uploadedImageUrl,
-          workspaceId
+          workspaceId,
         }
       )
 
@@ -242,6 +247,11 @@ const app = new Hono()
         )
 
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`
+
+        await storage.deleteFile(
+          BUCKET_ID,
+          file.$id
+        )
       } else {
         uploadedImageUrl = image;
       }
@@ -252,7 +262,7 @@ const app = new Hono()
         projectId,
         {
           name,
-          imageUrl: uploadedImageUrl
+          imageUrl: uploadedImageUrl,
         }
       )
 

@@ -221,6 +221,11 @@ const app = new Hono()
         )
 
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`
+
+        await storage.deleteFile(
+          BUCKET_ID,
+          file.$id
+        )
       } else {
         uploadedImageUrl = image;
       }
@@ -233,7 +238,7 @@ const app = new Hono()
           name,
           userId: user.$id,
           imageUrl: uploadedImageUrl,
-          inviteCode: generateInviteCode(6)
+          inviteCode: generateInviteCode(6),
         }
       )
 
@@ -288,6 +293,11 @@ const app = new Hono()
         )
 
         uploadedImageUrl = `data:image/png;base64,${Buffer.from(arrayBuffer).toString('base64')}`
+
+        await storage.deleteFile(
+          BUCKET_ID,
+          file.$id
+        )
       } else {
         uploadedImageUrl = image;
       }
@@ -298,7 +308,7 @@ const app = new Hono()
         workspaceId,
         {
           name,
-          imageUrl: uploadedImageUrl
+          imageUrl: uploadedImageUrl,
         }
       )
 
@@ -346,7 +356,7 @@ const app = new Hono()
           );
         })
       )
-      
+
       // deletar tarefas
 
       const tasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
