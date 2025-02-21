@@ -7,6 +7,7 @@ import PageLayout from "./pageLayout";
 import EditTaskModal from "@/features/tasks/components/edit-task-modal";
 import EditCategoriesModal from "@/features/categories/components/edit-categories-modal";
 import CreateCategoriesModal from "@/features/categories/components/create-categories-modal";
+import { ConfettiProvider } from "@/providers/confetti-provider";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,6 +25,7 @@ export default async function DashboardLayout({ children }: LayoutProps) {
           <CreateCategoriesModal />
           <EditTaskModal />
           <EditCategoriesModal />
+          <ConfettiProvider />
           <PageLayout>
             {children}
           </PageLayout>
