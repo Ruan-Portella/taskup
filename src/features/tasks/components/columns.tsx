@@ -11,6 +11,7 @@ import { statusToPTBR } from '@/lib/utils';
 import { TaskActions } from './task-actions';
 import { CircularProgress } from '@/components/circular-progress';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { CategoryColumn } from './category-column';
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -164,6 +165,41 @@ export const columns: ColumnDef<Task>[] = [
         <TaskDate value={dueDate} />
       )
     }
+  },
+  {
+    accessorKey: 'category',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          className='p-0 hover:bg-transparent'
+          onClick={column.getToggleSortingHandler()}>
+          Categoria
+          {
+            column.getIsSorted() === "asc" && (
+              <ArrowUp className="h-4 w-4" />
+            )
+          }
+          {
+            column.getIsSorted() === "desc" && (
+              <ArrowUp className="h-4 w-4 transform rotate-180" />
+            )
+          }
+          {
+            !column.getIsSorted() && (
+              <ArrowUpDown className="h-4 w-4" />
+            )
+          }
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      return (
+        <span>
+          <CategoryColumn category={row.original?.category?.name ?? ''} />
+        </span>
+      )
+    },
   },
   {
     accessorKey: 'status',

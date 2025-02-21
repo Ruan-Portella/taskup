@@ -23,6 +23,7 @@ export const useUpdateCategory = () => {
       toast.success('Categoria atualizada com sucesso!');
       queryClient.invalidateQueries({ queryKey: ['categories'] });
       queryClient.invalidateQueries({ queryKey: ['category', data.$id] });
+      queryClient.invalidateQueries({queryKey: ['tasks']});
     },
     onError: () => {
       toast.error('Erro ao atualizar a categoria');

@@ -13,6 +13,10 @@ const pathnameMap = {
     title: 'Projetos',
     description: 'Monitore todos os seus projetos e tarefas.',
   },
+  'categories': {
+    title: 'Categorias',
+    description: 'Crie e gerencie categorias.',
+  },
 }
 
 const defaultMap = {

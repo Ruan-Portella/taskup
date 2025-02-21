@@ -2,11 +2,12 @@ import { sessionMiddleware } from "@/lib/session-middleware";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { getMember } from "@/features/members/utils/get-member";
-import { CATEGORIES_ID, DATABASE_ID } from "@/config";
+import { CATEGORIES_ID, DATABASE_ID, TASKS_ID } from "@/config";
 import { ID, Query } from "node-appwrite";
 import { z } from "zod";
 import { Category } from "../types";
 import { createCategorySchema } from "../schemas";
+import { Task } from "@/features/tasks/types";
 
 const app = new Hono()
   .get(
@@ -85,7 +86,7 @@ const app = new Hono()
       if (!member) {
         return c.json({ error: 'You are not a member of this workspace' }, 403);
       }
-    
+
       const category = await databases.createDocument(
         DATABASE_ID,
         CATEGORIES_ID,
@@ -163,6 +164,25 @@ const app = new Hono()
       }
 
       await databases.deleteDocument(DATABASE_ID, CATEGORIES_ID, categoryId);
+
+      const tasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
+        Query.equal('categoryId', categoryId),
+      ]);
+
+      await Promise.all(
+        tasks.documents.map(async (task) => {
+          const { $id } = task;
+
+          return databases.updateDocument<Task>(
+            DATABASE_ID,
+            TASKS_ID,
+            $id,
+            {
+              categoryId: null,
+            }
+          );
+        })
+      )
 
       return c.json({ data: { categoryId } });
     }

@@ -10,6 +10,7 @@ interface useGetTasksProps {
   assigneeId?: string | null;
   dueDate?: string | null;
   hideAssigneeFilter?: boolean;
+  categoryId?: string | null;
 }
 
 export const useGetTasks = ({
@@ -19,15 +20,17 @@ export const useGetTasks = ({
   search,
   assigneeId,
   dueDate,
-  hideAssigneeFilter
+  hideAssigneeFilter,
+  categoryId
 }: useGetTasksProps) => {
   const query = useQuery({
-    queryKey: ['tasks', workspaceId, projectId, status, search, assigneeId, dueDate, hideAssigneeFilter],
+    queryKey: ['tasks', workspaceId, projectId, status, search, assigneeId, dueDate, hideAssigneeFilter, categoryId],
     queryFn: async () => {
       const response = await client.api.tasks.$get({query: {
         workspaceId, 
         projectId: projectId ?? undefined,
         status: status ?? undefined,
+        categoryId: categoryId ?? undefined,
         search: search ?? undefined,
         assigneeId: assigneeId ?? undefined,
         dueDate: dueDate ?? undefined,

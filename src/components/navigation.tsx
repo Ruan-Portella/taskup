@@ -11,7 +11,7 @@ import { GoCheckCircle, GoCheckCircleFill, GoHome, GoHomeFill } from 'react-icon
 import { useWorkspacesId } from "@/features/workspaces/hooks/use-workspaces-id";
 import { usePathname } from "next/navigation";
 
-import { SettingsIcon, UsersIcon } from 'lucide-react';
+import { SettingsIcon, TagsIcon, UsersIcon } from 'lucide-react';
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +39,12 @@ const routes = [
     href: '/members',
     icon: UsersIcon,
     activeIcon: UsersIcon
+  },
+  {
+    label: 'Categorias',
+    href: '/categories',
+    icon: TagsIcon,
+    activeIcon: TagsIcon
   }
 ];
 

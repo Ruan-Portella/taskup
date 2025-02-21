@@ -17,6 +17,10 @@ import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "@
 import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { TaskStatus } from "../types";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
+import { useCreateCategory } from "@/features/categories/api/use-create-category";
+import { SelectCreatable } from '@/components/creatable-select';
+import { useTaskId } from "../hooks/use-task-id";
+import { useGetCategories } from "@/features/categories/api/use-get-categories";
 
 interface CreateTaskFormProps {
   onCancel?: () => void;
@@ -30,7 +34,16 @@ interface CreateTaskFormProps {
 
 export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status, taskId, projectId, assigneeId }: CreateTaskFormProps) => {
   const workspaceId = useWorkspacesId();
+  const taskIdPath = useTaskId();
   const { mutate, isPending } = useCreateTask();
+  const categoryQuery = useGetCategories({ workspaceId });
+
+  const categoryMutation = useCreateCategory();
+  const onCreateCategory = (name: string) => categoryMutation.mutate({ json: { name, workspaceId } });
+  const categoryOptions = Array.isArray(categoryQuery?.data?.documents) && categoryQuery.data?.documents?.map((category: { name: string, $id: string }) => ({
+    label: category.name,
+    value: category.$id
+  })) || [];
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
     resolver: zodResolver(createTaskSchema.omit({ workspaceId: true })),
@@ -175,6 +188,18 @@ export const CreateTaskForm = ({ onCancel, projectOptions, memberOptions, status
                   </FormItem>
                 )}
               />
+              {
+                !taskIdPath && (
+                  <FormField name='categoryId' control={form.control} render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor='categoryId'>Categoria</FormLabel>
+                      <FormControl>
+                        <SelectCreatable placeholder='Selecione uma categoria' options={categoryOptions} onCreate={onCreateCategory} value={field.value} onChange={field.onChange} disabled={categoryMutation.isPending} />
+                      </FormControl>
+                    </FormItem>
+                  )} />
+                )
+              }
               {
                 !projectId && (
                   <FormField

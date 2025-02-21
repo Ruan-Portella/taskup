@@ -7,6 +7,7 @@ import React from 'react'
 import { TaskStatus } from '../types';
 import { useTaskFilters } from '../hooks/use-task-filters';
 import DatePicker from '@/components/date-picker';
+import { useGetCategories } from '@/features/categories/api/use-get-categories';
 
 interface DataFiltersProps {
   hideProjectFilter?: boolean;
@@ -18,6 +19,11 @@ export default function DataFilters({ hideProjectFilter, hideAssigneeFilter }: D
 
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects({ workspaceId });
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({ workspaceId });
+    const categoryQuery = useGetCategories({ workspaceId });
+    const categoryOptions = Array.isArray(categoryQuery?.data?.documents) && categoryQuery.data?.documents?.map((category: { name: string, $id: string }) => ({
+      label: category.name,
+      value: category.$id
+    })) || [];
 
   const isLoading = isLoadingProjects || isLoadingMembers;
 
@@ -35,7 +41,8 @@ export default function DataFilters({ hideProjectFilter, hideAssigneeFilter }: D
     status,
     assigneeId,
     projectId,
-    dueDate
+    dueDate,
+    categoryId
   }, setFilters] = useTaskFilters();
 
   const onStatusChange = (status: string) => {
@@ -48,6 +55,10 @@ export default function DataFilters({ hideProjectFilter, hideAssigneeFilter }: D
 
   const onProjectChange = (projectId: string) => {
     setFilters({ projectId: projectId === 'all' ? null : projectId });
+  };
+
+  const onCategoryChange = (categoryId: string) => {
+    setFilters({ categoryId: categoryId === 'all' ? null : categoryId });
   };
 
   if (isLoading) return null;
@@ -122,6 +133,25 @@ export default function DataFilters({ hideProjectFilter, hideAssigneeFilter }: D
           <SelectItem value={TaskStatus.DONE}>
             Concluído
           </SelectItem>
+        </SelectContent>
+      </Select>
+      <Select defaultValue={categoryId ?? undefined} onValueChange={(value) => onCategoryChange(value)}>
+        <SelectTrigger className='w-full lg:w-auto h-8'>
+          <div className='flex items-center gap-2'>
+            <ListChecksIcon className='size-4' />
+            <SelectValue placeholder='Todas Categorias' />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value='all'>Todas Categorias</SelectItem>
+          <SelectSeparator />
+          {
+            categoryOptions.map(category => (
+              <SelectItem key={category.value} value={category.value}>
+                {category.label}
+              </SelectItem>
+            ))
+          }
         </SelectContent>
       </Select>
     </div>

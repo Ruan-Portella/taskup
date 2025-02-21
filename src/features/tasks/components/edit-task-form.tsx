@@ -16,6 +16,10 @@ import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { Task, TaskStatus } from "../types";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
 import { useUpdateTask } from "../api/use-update-task";
+import { useCreateCategory } from "@/features/categories/api/use-create-category";
+import { useWorkspacesId } from "@/features/workspaces/hooks/use-workspaces-id";
+import { useGetCategories } from "@/features/categories/api/use-get-categories";
+import { SelectCreatable } from '@/components/creatable-select';
 
 interface EditTaskFormProps {
   onCancel?: () => void;
@@ -30,6 +34,16 @@ interface EditTaskFormProps {
 
 export const EditTaskForm = ({ onCancel, projectOptions, memberOptions, initialValues, projectId, assigneeId, parentTaskId, disableAssignee }: EditTaskFormProps) => {
   const { mutate, isPending } = useUpdateTask();
+
+  const workspaceId = useWorkspacesId();
+
+  const categoryQuery = useGetCategories({ workspaceId });
+  const categoryMutation = useCreateCategory();
+  const onCreateCategory = (name: string) => categoryMutation.mutate({ json: { name, workspaceId } });
+  const categoryOptions = Array.isArray(categoryQuery?.data?.documents) && categoryQuery.data?.documents?.map((category: { name: string, $id: string }) => ({
+    label: category.name,
+    value: category.$id
+  })) || [];
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
     resolver: zodResolver(createTaskSchema.omit({ workspaceId: true, description: true })),
@@ -174,6 +188,18 @@ export const EditTaskForm = ({ onCancel, projectOptions, memberOptions, initialV
                   </FormItem>
                 )}
               />
+              {
+                (!assigneeId && !disableAssignee) && (
+                  <FormField name='categoryId' control={form.control} render={({ field }) => (
+                    <FormItem>
+                      <FormLabel htmlFor='categoryId'>Categoria</FormLabel>
+                      <FormControl>
+                        <SelectCreatable placeholder='Selecione uma categoria' options={categoryOptions} onCreate={onCreateCategory} value={field.value} onChange={field.onChange} disabled={categoryMutation.isPending} />
+                      </FormControl>
+                    </FormItem>
+                  )} />
+                )
+              }
               {
                 !projectId && (
                   <FormField

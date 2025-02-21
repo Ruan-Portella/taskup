@@ -11,7 +11,7 @@ import { useWorkspacesId } from '@/features/workspaces/hooks/use-workspaces-id';
 import { useQueryState } from 'nuqs';
 import DataFilters from './data-filters';
 import { useTaskFilters } from '../hooks/use-task-filters';
-import { DataTable } from './data-table';
+import { DataTable } from '../../../components/data-table';
 import { columns } from './columns';
 import DataKanban from './data-kanban';
 import { TaskStatus } from '../types';
@@ -30,7 +30,8 @@ export default function TaskViewSwitcher({ hideProjectFilter, hideAssigneeFilter
     status,
     assigneeId,
     projectId,
-    dueDate
+    dueDate,
+    categoryId
   }] = useTaskFilters();
 
   const [view, setView] = useQueryState('task-view', {
@@ -43,7 +44,7 @@ export default function TaskViewSwitcher({ hideProjectFilter, hideAssigneeFilter
 
   const workspaceId = useWorkspacesId();
 
-  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId: assigneeId, projectId: projectId || defaultProjectId, dueDate, hideAssigneeFilter });
+  const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({ workspaceId, status, assigneeId: assigneeId, projectId: projectId || defaultProjectId, dueDate, hideAssigneeFilter, categoryId: categoryId });
   const { openProjectId, open, openSubTask } = useCreateTaskModal();
 
   const { mutate: bulkUpdateTasks } = useBulkUpdateTasks();

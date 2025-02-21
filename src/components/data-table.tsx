@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  data: TData[],
 }
 
 export function DataTable<TData, TValue>({
@@ -103,9 +103,9 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className={cn('flex items-center justify-between', isMobile && 'justify-end')}>
+      <div className={cn('flex items-center justify-between', (isMobile || columns.length <= 2) && 'justify-end')}>
         {
-          !isMobile && (
+          !isMobile && columns.length > 2 && (
             <p className="text-sm text-gray-500">
               Segure <kbd className="text-gray-900">Shift</kbd> ao clicar para ordenar por várias colunas.
             </p>

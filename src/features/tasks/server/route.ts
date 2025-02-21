@@ -3,24 +3,25 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { createTaskSchema } from "../schemas";
 import { getMember } from "@/features/members/utils/get-member";
-import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID, TASKS_ID } from "@/config";
+import { CATEGORIES_ID, DATABASE_ID, MEMBERS_ID, PROJECTS_ID, TASKS_ID } from "@/config";
 import { ID, Query } from "node-appwrite";
 import { z } from "zod";
 import { Task, TaskStatus } from "../types";
 import { createAdminClient } from "@/lib/appwrite";
 import { Project } from "@/features/projects/types/project";
+import { Category } from "@/features/categories/types";
 
 const app = new Hono()
   .get(
     '/',
     sessionMiddleware,
-    zValidator('query', z.object({ workspaceId: z.string(), projectId: z.string().nullish(), assigneeId: z.string().nullish(), status: z.nativeEnum(TaskStatus).nullish(), search: z.string().nullish(), dueDate: z.string().nullish(), hideAssigneeFilter: z.string().nullish() })),
+    zValidator('query', z.object({ workspaceId: z.string(), projectId: z.string().nullish(), assigneeId: z.string().nullish(), status: z.nativeEnum(TaskStatus).nullish(), categoryId: z.string().nullish(), search: z.string().nullish(), dueDate: z.string().nullish(), hideAssigneeFilter: z.string().nullish() })),
     async (c) => {
       const { users } = await createAdminClient();
       const databases = c.get('databases');
       const user = c.get('user');
 
-      const { workspaceId, projectId, assigneeId, status, search, dueDate, hideAssigneeFilter } = c.req.valid('query');
+      const { workspaceId, projectId, assigneeId, status, search, dueDate, hideAssigneeFilter, categoryId } = c.req.valid('query');
 
       const member = await getMember({
         databases,
@@ -43,6 +44,10 @@ const app = new Hono()
 
       if (status) {
         query.push(Query.equal('status', status));
+      }
+
+      if (categoryId) {
+        query.push(Query.equal('categoryId', categoryId));
       }
 
       if (hideAssigneeFilter === 'true') {
@@ -69,12 +74,15 @@ const app = new Hono()
         total: searchTasks.documents.filter((task) => task.parentTaskId === null).length
       }
 
-      const projectIds = tasks.documents.map((task) => task.projectId);
-      const assignneIds = tasks.documents.map((task) => task.assigneeId);
+      const projectIds = tasks.documents.map((task) => task.projectId).filter(Boolean);
+      const assignneIds = tasks.documents.map((task) => task.assigneeId).filter(Boolean);
+      const categoriesIds = tasks.documents.map((task) => task.categoryId).filter(Boolean);
 
-      const projects = await databases.listDocuments<Project>(DATABASE_ID, PROJECTS_ID, projectIds.length > 0 ? [Query.contains('$id', projectIds)] : []);
+      const projects = await databases.listDocuments<Project>(DATABASE_ID, PROJECTS_ID, projectIds.length > 0 ? [Query.contains('$id', projectIds)] : [Query.isNull('$id')]);
 
-      const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, assignneIds.length > 0 ? [Query.contains('$id', assignneIds)] : []);
+      const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, assignneIds.length > 0 ? [Query.contains('$id', assignneIds)] : [Query.isNull('$id')]);
+
+      const categories = await databases.listDocuments<Category>(DATABASE_ID, CATEGORIES_ID, categoriesIds.length > 0 ? [Query.contains('$id', categoriesIds)] : [Query.isNull('$id')]);
 
       const assignees = await Promise.all(
         members.documents.map(async (member) => {
@@ -90,11 +98,13 @@ const app = new Hono()
           total: searchTasks.documents.filter((subtask) => subtask.parentTaskId === task.$id).length,
           documents: searchTasks.documents.filter((subtask) => subtask.parentTaskId === task.$id),
         }
+        const category = categories.documents.find((category) => category.$id === task.categoryId);
 
         return {
           ...task,
           project,
           assignee,
+          category,
           subtasks
         };
       });
@@ -113,6 +123,7 @@ const app = new Hono()
       const {
         name,
         status,
+        categoryId,
         workspaceId,
         projectId,
         dueDate,
@@ -150,6 +161,7 @@ const app = new Hono()
         {
           name,
           status,
+          categoryId,
           workspaceId,
           projectId,
           dueDate,
@@ -197,6 +209,7 @@ const app = new Hono()
       const {
         name,
         status,
+        categoryId,
         description,
         projectId,
         dueDate,
@@ -243,6 +256,7 @@ const app = new Hono()
         {
           name,
           status,
+          categoryId,
           projectId,
           dueDate,
           assigneeId,
@@ -367,6 +381,8 @@ const app = new Hono()
 
       const member = await databases.getDocument(DATABASE_ID, MEMBERS_ID, task.assigneeId);
 
+      const category = await databases.getDocument(DATABASE_ID, CATEGORIES_ID, task.categoryId || '');
+
       const user = await users.get(member.userId);
 
       const assignee = {
@@ -381,6 +397,7 @@ const app = new Hono()
           project,
           subtasks,
           assignee,
+          category
         }
       });
     }

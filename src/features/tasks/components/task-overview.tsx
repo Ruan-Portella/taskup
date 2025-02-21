@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { statusToPTBR } from '@/lib/utils'
 import { useEditTaskModal } from '../hooks/use-edit-task-modal'
 import { Progress } from '@/components/ui/progress'
+import { CategoryColumn } from './category-column'
 
 interface TaskOverviewProps {
   task: Task
@@ -47,6 +48,9 @@ export default function TaskOverview({
             <Badge variant={task.status}>
               {statusToPTBR(task.status)}
             </Badge>
+          </OverviewProperty>
+          <OverviewProperty label='Status'>
+            <CategoryColumn category={task.category.name} />
           </OverviewProperty>
           <OverviewProperty label='Progresso'>
             <div className='flex items-center gap-x-2'>
