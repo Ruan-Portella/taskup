@@ -9,7 +9,7 @@ import { createProjectSchema } from "../schemas/create";
 import { updateProjectSchema } from "../schemas/update";
 import { Project } from "../types/project";
 import { endOfMonth, startOfMonth, subMonths } from "date-fns";
-import { TaskStatus } from "@/features/tasks/types";
+import { Task, TaskStatus } from "@/features/tasks/types";
 
 const app = new Hono()
   .get(
@@ -118,7 +118,7 @@ const app = new Hono()
       const lastMonthAssignedTask = lastMonthTask.documents.filter(task => task.assigneeId === member.$id).length;
 
       const assignedTaskDifference = thisMonthAssignedTask - lastMonthAssignedTask;
-      
+
       const thisMonthIncompleteTask = thisMonthTask.documents.filter(task => task.status !== TaskStatus.DONE).length;
 
       const lastMonthIncompleteTask = lastMonthTask.documents.filter(task => task.status !== TaskStatus.DONE).length;
@@ -137,18 +137,20 @@ const app = new Hono()
 
       const overdueTaskDifference = thisMonthOverdueTask - lastMonthOverdueTask;
 
-      return c.json({ data: {
-        taskCount: thisMonthTask.total,
-        taskDifference,
-        assignedTaskCount: thisMonthAssignedTask,
-        assignedTaskDifference,
-        incompleteTaskCount: thisMonthIncompleteTask,
-        incompleteTaskDifference,
-        completeTaskCount: thisMonthCompleteTask,
-        completeTaskDifference,
-        overdueTaskCount: thisMonthOverdueTask,
-        overdueTaskDifference
-      }})
+      return c.json({
+        data: {
+          taskCount: thisMonthTask.total,
+          taskDifference,
+          assignedTaskCount: thisMonthAssignedTask,
+          assignedTaskDifference,
+          incompleteTaskCount: thisMonthIncompleteTask,
+          incompleteTaskDifference,
+          completeTaskCount: thisMonthCompleteTask,
+          completeTaskDifference,
+          overdueTaskCount: thisMonthOverdueTask,
+          overdueTaskDifference
+        }
+      })
     }
   )
   .post(
@@ -256,35 +258,53 @@ const app = new Hono()
 
       return c.json({ data: project })
     }
-  )  
+  )
   .delete(
-      "/:projectId",
-      sessionMiddleware,
-      async (c) => {
-        const databases = c.get("databases");
-        const user = c.get("user");
-        const { projectId } = c.req.param();
+    "/:projectId",
+    sessionMiddleware,
+    async (c) => {
+      const databases = c.get("databases");
+      const user = c.get("user");
+      const { projectId } = c.req.param();
 
-        const existingProject = await databases.getDocument<Project>(DATABASE_ID, PROJECTS_ID, projectId);
-  
-        const member = await getMember({
-          databases,
-          userId: user.$id,
-          workspaceId: existingProject.workspaceId
-        })
-  
-        if (!member) {
-          return c.json({error: 'Unauthorized'}, 401)
-        }
-  
-        await databases.deleteDocument(
-          DATABASE_ID,
-          PROJECTS_ID,
-          projectId
-        )
-  
-        return c.json({ data: { $id: projectId } });
+      const existingProject = await databases.getDocument<Project>(DATABASE_ID, PROJECTS_ID, projectId);
+
+      const member = await getMember({
+        databases,
+        userId: user.$id,
+        workspaceId: existingProject.workspaceId
+      })
+
+      if (!member) {
+        return c.json({ error: 'Unauthorized' }, 401)
       }
-    )
+
+      await databases.deleteDocument(
+        DATABASE_ID,
+        PROJECTS_ID,
+        projectId
+      )
+
+      // deletar tarefas
+
+      const tasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
+        Query.equal('projectId', projectId),
+      ]);
+
+      await Promise.all(
+        tasks.documents.map(async (task) => {
+          const { $id } = task;
+
+          return databases.deleteDocument(
+            DATABASE_ID,
+            TASKS_ID,
+            $id,
+          );
+        })
+      )
+
+      return c.json({ data: { $id: projectId } });
+    }
+  )
 
 export default app;
