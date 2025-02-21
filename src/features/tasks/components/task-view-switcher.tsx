@@ -49,7 +49,7 @@ export default function TaskViewSwitcher({ hideProjectFilter, hideAssigneeFilter
 
   const { mutate: bulkUpdateTasks } = useBulkUpdateTasks();
 
-  const onKanbanChange = useCallback((tasks: { $id: string, status: TaskStatus, position: number }[]) => {
+  const onKanbanChange = useCallback((tasks: { $id: string, status: TaskStatus, oldStatus: TaskStatus, position: number }[]) => {
     bulkUpdateTasks({
       json: { tasks }
     });
