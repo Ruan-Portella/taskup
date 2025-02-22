@@ -47,7 +47,7 @@ export default function WorkspaceIdPage() {
     <div className='h-full flex flex-col space-y-4'>
       <Analytics data={analytics} />
       <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
-        <TaskList data={tasks.documents} total={tasks.total} />
+        <TaskList data={tasks.documents.slice(0,3)} total={tasks.total} />
         <ProjectList data={projects.documents} total={projects.total} />
         <MembersList data={members.documents} total={members.total} />
       </div>
