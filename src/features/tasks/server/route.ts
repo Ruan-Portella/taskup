@@ -227,6 +227,8 @@ const app = new Hono()
         return c.json({ error: 'You are not a member of this workspace' }, 403);
       }
 
+      let hasTaskCompleted = false;
+
       let completionPercentage = 0;
 
       if (parentTaskId) {
@@ -242,9 +244,16 @@ const app = new Hono()
           const completedSubtasks = subtasks.documents.filter(task => task.status === TaskStatus.DONE).length + (status === TaskStatus.DONE ? 1 : 0);
 
           completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
+
+          if (existingTask.status !== TaskStatus.DONE && completionPercentage === 100) {
+            hasTaskCompleted = true;
+          }
         } else {
           if (status === TaskStatus.DONE) {
             completionPercentage = 100;
+            if (existingTask.status !== TaskStatus.DONE) {
+              hasTaskCompleted = true;
+            }
           }
         }
       }
@@ -266,8 +275,6 @@ const app = new Hono()
         }
       );
 
-      let completionPercentageParent = 0;
-
       if (parentTaskId) {
         const subtasks = await databases.listDocuments<Task>(DATABASE_ID, TASKS_ID, [
           Query.equal("parentTaskId", parentTaskId),
@@ -281,7 +288,9 @@ const app = new Hono()
 
         const completionPercentage = Math.round((completedSubtasks / (subtasks.total + 1)) * 100);
 
-        completionPercentageParent = completionPercentage;
+        if (completionPercentage === 100) {
+          hasTaskCompleted = true;
+        }
 
         await databases.updateDocument(DATABASE_ID, TASKS_ID, parentTaskId, {
           completionPercentage,
@@ -294,9 +303,8 @@ const app = new Hono()
         projectId,
         workspaceId: existingTask.workspaceId,
         parentTaskId,
-        completionPercentage,
-        completionPercentageParent
-      }, projectId, workspaceId: existingTask.workspaceId, parentTaskId, completionPercentage });
+        hasTaskCompleted,
+      }, projectId, workspaceId: existingTask.workspaceId, parentTaskId });
     }
   )
   .delete(

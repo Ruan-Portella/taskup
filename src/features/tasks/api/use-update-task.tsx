@@ -31,11 +31,7 @@ export const useUpdateTask = () => {
       queryClient.invalidateQueries({ queryKey: ['project-analytics', projectId] });
       queryClient.invalidateQueries({ queryKey: ['workspace-analytics', workspaceId] });
 
-      if (data.completionPercentage === 100 && !data.parentTaskId) {
-        onOpen();
-      }
-
-      if (data.parentTaskId && data.completionPercentageParent === 100) {
+      if (data.hasTaskCompleted) {
         onOpen();
       }
     },
