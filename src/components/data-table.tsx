@@ -11,6 +11,7 @@ import {
   getSortedRowModel,
   ColumnFiltersState,
   getFilteredRowModel,
+  VisibilityState,
 } from "@tanstack/react-table"
 
 import {
@@ -22,9 +23,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { Button } from "@/components/ui/button"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
+import { useProjectId } from "@/features/projects/hooks/use-project-id"
+import { DataTablePagination } from "./data-table-pagination"
+import { parseAsInteger, useQueryState } from "nuqs"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -36,10 +39,15 @@ export function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const isMobile = useIsMobile()
+  const projectId = useProjectId()
+
+  const [pageIndex, setPageIndex] = useQueryState('pageIndex', parseAsInteger.withDefault(0));
+  const [pageSize, setPageSize] = useQueryState('pageSize', parseAsInteger.withDefault(10));
   const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    'project': projectId ? false : true,
+  })
 
   const table = useReactTable({
     data,
@@ -47,13 +55,27 @@ export function DataTable<TData, TValue>({
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: (updater) => {
+      const newPagination = typeof updater === "function" ? updater({ pageIndex, pageSize }) : updater;
+
+      setPageIndex(newPagination.pageIndex);
+      setPageSize(newPagination.pageSize);
+    },
     onColumnFiltersChange: setColumnFilters,
+    getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    autoResetPageIndex: false,
     enableMultiSort: true,
+    rowCount: data.length,
     state: {
       sorting,
       columnFilters,
+      columnVisibility,
+      pagination: {
+        pageIndex,
+        pageSize,
+      }
     },
   })
 
@@ -103,7 +125,8 @@ export function DataTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <div className={cn('flex items-center justify-between', (isMobile || columns.length <= 2) && 'justify-end')}>
+      <DataTablePagination table={table} />
+      <div className={cn('flex items-center justify-between mt-2', (isMobile || columns.length <= 2) && 'justify-end')}>
         {
           !isMobile && columns.length > 2 && (
             <p className="text-sm text-gray-500">
@@ -111,24 +134,6 @@ export function DataTable<TData, TValue>({
             </p>
           )
         }
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Anterior
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Próximo
-          </Button>
-        </div>
       </div>
     </div>
   )

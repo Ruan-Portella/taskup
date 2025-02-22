@@ -49,6 +49,7 @@ export const columns: ColumnDef<Task>[] = [
   },
   {
     accessorKey: 'project',
+    enableHiding: true,
     header: ({ column }) => {
       return (
         <Button
