@@ -73,7 +73,7 @@ export function DataTable<TData, TValue>({
       columnFilters,
       columnVisibility,
       pagination: {
-        pageIndex,
+        pageIndex: pageIndex ? pageIndex - 1 : 0,
         pageSize,
       }
     },

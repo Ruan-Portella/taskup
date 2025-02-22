@@ -1,12 +1,5 @@
 import { Table } from "@tanstack/react-table"
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import {
   Select,
   SelectContent,
@@ -14,6 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "./ui/pagination"
+import { ReactNode } from "react"
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -22,15 +17,100 @@ interface DataTablePaginationProps<TData> {
 export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
+  const totalPageCount = table.getPageCount();
+  const page = table.getState().pagination.pageIndex === 0 ? 1 : table.getState().pagination.pageIndex + 1;
+
+  const renderPageNumbers = () => {
+    const items: ReactNode[] = [];
+
+    items.push(
+      <PaginationItem key={1}>
+        <PaginationLink href="#" onClick={() => table.setPageIndex(1)} isActive={page === 1}>
+          1
+        </PaginationLink>
+      </PaginationItem>,
+    );
+
+    if (page > 3 && totalPageCount > 5) {
+      items.push(
+        <PaginationItem key="ellipsis-start">
+          <PaginationEllipsis />
+        </PaginationItem>,
+      );
+    }
+
+    let startPage = 0;
+
+    if (page >= totalPageCount - 3) {
+      startPage = totalPageCount - 4
+    } else {
+      startPage = page - 1
+    }
+
+    const start = Math.max(2, startPage);
+
+    let endPage = 0;
+
+    if (page <= 3) {
+      endPage = 4
+    } else {
+      endPage = page + 1
+    }
+
+    const end = Math.min(totalPageCount - 1, endPage);
+
+    if (totalPageCount > 1) {
+      for (let i = start; i <= end; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink href={'#'} onClick={() => table.setPageIndex(i)} isActive={page === i}>
+              {i}
+            </PaginationLink>
+          </PaginationItem>,
+        );
+      }
+    }
+
+    if (page < totalPageCount - 2 && totalPageCount > 5) {
+      items.push(
+        <PaginationItem key="ellipsis-end">
+          <PaginationEllipsis />
+        </PaginationItem>,
+      );
+    }
+
+    if (totalPageCount === 2) {
+      items.push(
+        <PaginationItem key={2}>
+          <PaginationLink href={'#'} onClick={() => table.setPageIndex(2)} isActive={page === 2}>
+            2
+          </PaginationLink>
+        </PaginationItem>,
+      );
+    }
+
+    if (totalPageCount > 2) {
+      items.push(
+        <PaginationItem key={totalPageCount}>
+          <PaginationLink href={'#'} onClick={() => table.setPageIndex(totalPageCount)} isActive={page === totalPageCount}>
+            {totalPageCount}
+          </PaginationLink>
+        </PaginationItem>,
+      );
+    }
+
+    return items;
+  };
+
   return (
-    <div className="flex items-center justify-between mt-4">
-      <div className="w-[100px] items-center text-sm font-medium hidden md:flex">
+    <div className="flex items-center justify-between mt-4 flex-col lg:flex-row">
+      <div className="w-full items-center text-sm font-medium hidden md:flex">
         Página {table.getState().pagination.pageIndex + 1} de{" "}
         {table.getPageCount()}
       </div>
-      <div className="flex w-full items-center justify-between space-x-4 md:justify-end">
+      <div className="flex w-full flex-col gap-2 items-center justify-between sm:flex-row lg:justify-end">
         <div className="flex items-center space-x-2">
-          <p className="text-sm font-medium">Linhas por página</p>
+          <p className="text-sm font-medium truncate">Linhas por página</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
@@ -49,51 +129,18 @@ export function DataTablePagination<TData>({
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">
-              Ir para a primeira página
-            </span>
-            <ChevronsLeft />
-          </Button>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            <span className="sr-only">
-              Ir para a página anterior
-            </span>
-            <ChevronLeft />
-          </Button>
-          <Button
-            variant="outline"
-            className="h-8 w-8 p-0"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">
-              Ir para a próxima página
-            </span>
-            <ChevronRight />
-          </Button>
-          <Button
-            variant="outline"
-            className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-          >
-            <span className="sr-only">
-              Ir para a última página
-            </span>
-            <ChevronsRight />
-          </Button>
+        <div className="flex items-center">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious href="#" onClick={() => table.setPageIndex(table.getState().pagination.pageIndex)} />
+              </PaginationItem>
+              {renderPageNumbers()}
+              <PaginationItem>
+                <PaginationNext href="#" onClick={() => table.setPageIndex((table.getState().pagination.pageIndex + 2) > (totalPageCount - 1) ? totalPageCount : table.getState().pagination.pageIndex + 2)} />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
         </div>
       </div>
     </div>
