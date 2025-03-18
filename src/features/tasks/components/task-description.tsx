@@ -4,7 +4,8 @@ import { useUpdateTask } from '../api/use-update-task';
 import { Button } from '@/components/ui/button';
 import { PencilIcon, XIcon } from 'lucide-react';
 import { DottedSeparator } from '@/components/dotted-separator';
-import { Textarea } from '@/components/ui/textarea';
+import { Preview } from './quill-preview';
+import { Editor } from './quill-editor';
 
 interface TaskDescriptionProps {
   task: Task;
@@ -50,12 +51,9 @@ export default function TaskDescription({ task }: TaskDescriptionProps) {
       {
         isEditing ? (
           <div className='flex flex-col gap-y-4'>
-            <Textarea
-              placeholder='Adicione uma descrição'
+            <Editor 
               value={value}
-              rows={4}
-              onChange={(e) => setValue(e.target.value)}
-              disabled={isPending}
+              onChange={setValue}
             />
             <Button onClick={handleSave} disabled={isPending} size='sm' className='w-fit ml-auto'>
               {isPending ? 'Salvando...' : 'Salvar'}
@@ -63,14 +61,7 @@ export default function TaskDescription({ task }: TaskDescriptionProps) {
           </div>
         ) : (
           <div>
-            {
-              task.description || (
-                <p className='text-muted-foreground'>
-                  Nenhuma descrição.
-                </p>
-              )
-
-            }
+              <Preview value={task.description} /> 
           </div>
         )
       }
