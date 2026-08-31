@@ -26,6 +26,12 @@ import { createAdminClient } from '@/lib/appwrite';
 /// `users.get`/`users.list` é a leitura mais barata que a chave já tem permissão
 /// para fazer: `createAdminClient().users` é usado pelas rotas de membros e de
 /// tarefas, então o escopo existe.
+/// ## O agendamento fica no `vercel.json`, sem comentário
+///
+/// `0 6 * * *`, em **UTC** — 03:00 em Brasília. O horário não está anotado lá
+/// porque o `vercel.json` valida o schema estritamente: uma chave `comment` dentro
+/// de `crons[0]` faz o deploy falhar com *"should NOT have additional property"*.
+/// JSON não tem comentário, então a explicação mora aqui.
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {

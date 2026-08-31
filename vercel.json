@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "comment": "Mantem o projeto do Appwrite acordado. O horario e UTC: 06:00 UTC = 03:00 em Brasilia. Ver src/app/api/health/route.ts.",
       "path": "/api/health",
       "schedule": "0 6 * * *"
     }
