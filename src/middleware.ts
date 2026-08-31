@@ -14,6 +14,20 @@ export async function middleware(request: NextRequest) {
   const isApiAuthRoute = nextUrl.pathname.startsWith('/api/auth') || nextUrl.pathname.startsWith('/oauth');
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
+  /// **O ping do cron passa antes de qualquer coisa.**
+  ///
+  /// Sem esta linha o keep-alive era inútil e parecia funcionar: o matcher abaixo
+  /// pega tudo que não é arquivo estático, e quem não está logado cai no
+  /// `Response.redirect` para `/sign-in`. O cron receberia um 307, a rota
+  /// `/api/health` nunca rodaria, e **nada falaria com o Appwrite** — o projeto
+  /// pausaria com o cron verde.
+  ///
+  /// Vem antes do `getUser()` de propósito: o ping não tem sessão e não deve
+  /// gastar uma ida ao Appwrite para descobrir isso.
+  if (nextUrl.pathname === '/api/health') {
+    return null;
+  }
+
   if (isApiAuthRoute) {
     return null;
   }
